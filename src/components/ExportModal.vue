@@ -71,7 +71,29 @@
           <Smartphone :size="16" />
           <span>Digital PDF</span>
         </button>
+        <button
+          @click="sendToZineStudio"
+          class="download-button studio-button"
+          :disabled="!canHandoff || handoffStatus === 'sending'"
+          :title="canHandoff ? 'Send pages to Zine Studio' : 'No pages to send'"
+        >
+          <Send :size="16" />
+          <span>{{ handoffStatus === 'sending' ? 'Sending…' : 'Send to Zine Studio' }}</span>
+        </button>
       </div>
+
+      <div v-if="handoffStatus === 'done'" class="handoff-status handoff-status--success">
+        <span>Sent {{ handoffPageCount }} page{{ handoffPageCount === 1 ? '' : 's' }} to Zine Studio.</span>
+        <a :href="zineStudioFromEditorUrl" class="handoff-link">Open Zine Studio →</a>
+      </div>
+      <div v-else-if="handoffStatus === 'error'" class="handoff-status handoff-status--error">
+        <span>Couldn't send to Zine Studio{{ handoffError ? `: ${handoffError}` : '.' }} Try downloading the PNGs instead.</span>
+      </div>
+
+      <p class="studio-crosslink">
+        Need professional imposition or a scroll PDF?
+        <a :href="zineStudioUrl" target="_blank" rel="noopener noreferrer" class="handoff-link">Impose &amp; print with Zine Studio →</a>
+      </p>
 
       <div class="print-instructions">
         <h4>Printing Instructions:</h4>
@@ -86,20 +108,55 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Download, FileText, Smartphone } from 'lucide-vue-next';
+import { ref, computed, watch } from 'vue';
+import { Download, FileText, Smartphone, Send } from 'lucide-vue-next';
 import { useUIStore } from '@/stores/ui';
+import { useAssetStore } from '@/stores/assetStore';
+import type { ZineProject } from '@/types';
+import { sendProjectToZineStudio, ZINE_STUDIO_URL } from '@/utils/zineStudioHandoff';
 
-const props = defineProps<{ visible: boolean; imageSrc: string }>();
+const props = defineProps<{ visible: boolean; imageSrc: string; project?: ZineProject | null }>();
 
 defineEmits<{
   (e: 'close'): void;
 }>();
 
 const uiStore = useUIStore();
+const assetStore = useAssetStore();
 const activeTab = ref<'png' | 'pdf' | 'digital'>('png');
 const pageIndex = ref(0);
 const currentPng = computed(() => uiStore.exportImages.length ? uiStore.exportImages[pageIndex.value] : props.imageSrc);
+
+const zineStudioUrl = ZINE_STUDIO_URL;
+const zineStudioFromEditorUrl = `${ZINE_STUDIO_URL}?from=editor`;
+const handoffStatus = ref<'idle' | 'sending' | 'done' | 'error'>('idle');
+const handoffError = ref('');
+const handoffPageCount = ref(0);
+const canHandoff = computed(() => !!props.project && props.project.pages.length > 0);
+
+watch(() => props.visible, (visible) => {
+  if (visible) {
+    handoffStatus.value = 'idle';
+    handoffError.value = '';
+  }
+});
+
+async function sendToZineStudio() {
+  if (!canHandoff.value || handoffStatus.value === 'sending') return;
+  handoffStatus.value = 'sending';
+  handoffError.value = '';
+  try {
+    handoffPageCount.value = await sendProjectToZineStudio(
+      props.project as ZineProject,
+      (id) => assetStore.getAsset(id)
+    );
+    handoffStatus.value = 'done';
+  } catch (error) {
+    console.error('Zine Studio handoff failed:', error);
+    handoffError.value = error instanceof Error ? error.message : String(error);
+    handoffStatus.value = 'error';
+  }
+}
 
 function nextPage() { if (pageIndex.value < uiStore.exportImages.length - 1) pageIndex.value++; }
 function prevPage() { if (pageIndex.value > 0) pageIndex.value--; }
@@ -341,6 +398,61 @@ function downloadDigitalPdf() {
 .digital-button:disabled {
   background: #93c5fd;
   cursor: not-allowed;
+}
+
+.studio-button {
+  background: #7c3aed;
+  color: white;
+}
+
+.studio-button:hover {
+  background: #6d28d9;
+}
+
+.studio-button:disabled {
+  background: #c4b5fd;
+  cursor: not-allowed;
+}
+
+.handoff-status {
+  margin-top: 1rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.handoff-status--success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.handoff-status--error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.handoff-link {
+  color: #6d28d9;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.handoff-link:hover {
+  text-decoration: underline;
+}
+
+.studio-crosslink {
+  margin: 0.75rem 0 0 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #6b7280;
 }
 
 .print-instructions {

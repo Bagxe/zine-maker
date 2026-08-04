@@ -8,6 +8,7 @@
     <ExportModal 
       :visible="uiStore.showExportModal"
       :image-src="uiStore.exportImageData"
+      :project="projectStore.currentProject"
       @close="uiStore.showExportModal = false"
     />
 

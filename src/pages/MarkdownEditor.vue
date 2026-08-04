@@ -4,6 +4,7 @@
     <ExportModal 
       :visible="showExportModal"
       :image-src="uiStore.exportImageData"
+      :project="currentProject"
       @close="closeExportModal"
     />
     
