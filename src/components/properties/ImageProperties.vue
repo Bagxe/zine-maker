@@ -6,7 +6,7 @@
         <label>Source</label>
         <div class="image-source">
           <div class="image-preview">
-            <img :src="imageProps.src" :alt="imageProps.alt" />
+            <img :src="imageProps.src" :alt="imageProps.alt" @load="onPreviewLoad" />
           </div>
           <div class="image-info">
             <input 
@@ -70,6 +70,58 @@
       </div>
     </div>
 
+    <div class="property-section" v-if="naturalSize">
+      <h4>Crop</h4>
+      <div class="property-row">
+        <div class="property-group">
+          <label>X</label>
+          <NumberInput
+            :value="cropData.x"
+            @update="updateCrop('x', $event)"
+            :min="0"
+            :max="naturalSize.width - 1"
+            suffix="px"
+          />
+        </div>
+        <div class="property-group">
+          <label>Y</label>
+          <NumberInput
+            :value="cropData.y"
+            @update="updateCrop('y', $event)"
+            :min="0"
+            :max="naturalSize.height - 1"
+            suffix="px"
+          />
+        </div>
+      </div>
+      <div class="property-row">
+        <div class="property-group">
+          <label>Width</label>
+          <NumberInput
+            :value="cropData.width"
+            @update="updateCrop('width', $event)"
+            :min="1"
+            :max="naturalSize.width"
+            suffix="px"
+          />
+        </div>
+        <div class="property-group">
+          <label>Height</label>
+          <NumberInput
+            :value="cropData.height"
+            @update="updateCrop('height', $event)"
+            :min="1"
+            :max="naturalSize.height"
+            suffix="px"
+          />
+        </div>
+      </div>
+      <p class="crop-hint">Source pixels — the cropped region fills the image box.</p>
+      <button v-if="imageProps.crop" @click="resetCrop" class="action-button">
+        Reset Crop
+      </button>
+    </div>
+
     <div class="property-section">
       <h4>Actions</h4>
       <div class="property-group">
@@ -86,8 +138,9 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type { ZineContent, ImageProperties } from '@/types';
+import type { ZineContent, ImageProperties, ImageCrop } from '@/types';
 import { useProjectStore } from '@/stores/project';
+import NumberInput from './NumberInput.vue';
 
 interface Props {
   content: ZineContent;
@@ -104,6 +157,40 @@ const projectStore = useProjectStore();
 const fileInput = ref<HTMLInputElement | null>(null);
 
 const imageProps = computed(() => props.content.properties as ImageProperties);
+
+// Natural size of the source image, captured from the preview element
+const naturalSize = ref<{ width: number; height: number } | null>(null);
+
+function onPreviewLoad(event: Event) {
+  const img = event.target as HTMLImageElement;
+  if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+    naturalSize.value = { width: img.naturalWidth, height: img.naturalHeight };
+  }
+}
+
+// Current crop region, defaulting to the full source frame
+const cropData = computed<ImageCrop>(() => {
+  if (imageProps.value.crop) return imageProps.value.crop;
+  return { x: 0, y: 0, width: naturalSize.value?.width ?? 0, height: naturalSize.value?.height ?? 0 };
+});
+
+function updateCrop(key: keyof ImageCrop, value: number) {
+  const size = naturalSize.value;
+  if (!size) return;
+  const next: ImageCrop = { ...cropData.value, [key]: value };
+  // Clamp the region to the source frame
+  next.x = Math.min(Math.max(0, next.x), size.width - 1);
+  next.y = Math.min(Math.max(0, next.y), size.height - 1);
+  next.width = Math.min(Math.max(1, next.width), size.width - next.x);
+  next.height = Math.min(Math.max(1, next.height), size.height - next.y);
+  // A full-frame crop is the same as no crop
+  const isFullFrame = next.x === 0 && next.y === 0 && next.width === size.width && next.height === size.height;
+  updateProperty('crop', isFullFrame ? undefined : next);
+}
+
+function resetCrop() {
+  updateProperty('crop', undefined);
+}
 
 function updateProperty(key: keyof ImageProperties, value: any) {
   emit('update', props.content.id, {
@@ -136,12 +223,13 @@ function handleImageChange(event: Event) {
 }
 
 function resetImage() {
-  // Reset filters and opacity
+  // Reset filters, opacity and crop
   emit('update', props.content.id, {
     properties: { 
       ...imageProps.value, 
       opacity: 1,
-      filters: undefined
+      filters: undefined,
+      crop: undefined
     }
   });
 }
@@ -185,6 +273,21 @@ function duplicateImage() {
 
 .property-group:last-child {
   margin-bottom: 0;
+}
+
+.property-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.property-row .property-group {
+  flex: 1;
+}
+
+.crop-hint {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.75rem;
+  color: #9ca3af;
 }
 
 label {

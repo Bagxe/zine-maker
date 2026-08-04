@@ -238,22 +238,30 @@ export async function exportZineForTemplate(
 
 export async function createKonvaNode(content: ZineContent, getAsset: GetAssetFn): Promise<Konva.Node | null> {
   const common = { x: content.x, y: content.y, width: content.width, height: content.height, rotation: content.rotation } as const;
+  // Mirror around the node's own bounding box when flipped
+  const flip = {
+    scaleX: content.flipX ? -1 : 1,
+    scaleY: content.flipY ? -1 : 1,
+    offsetX: content.flipX ? content.width : 0,
+    offsetY: content.flipY ? content.height : 0,
+  } as const;
 
   if (content.type === 'shape') {
     const p = content.properties as ShapeProperties;
-    const cfg = { ...common, fill: p.fill, stroke: p.stroke, strokeWidth: p.strokeWidth, opacity: p.opacity };
+    const cfg = { ...common, ...flip, fill: p.fill, stroke: p.stroke, strokeWidth: p.strokeWidth, opacity: p.opacity };
     if (p.shapeType === 'rectangle') return new Konva.Rect({ ...cfg, cornerRadius: p.cornerRadius || 0 });
     if (p.shapeType === 'circle') {
       const r = Math.min(content.width, content.height) / 2;
-      return new Konva.Circle({ ...cfg, x: common.x + r, y: common.y + r, radius: r });
+      // Center-based geometry: mirror around the center, not the bounding box
+      return new Konva.Circle({ ...cfg, x: common.x + r, y: common.y + r, radius: r, offsetX: 0, offsetY: 0 });
     }
-    if (p.shapeType === 'triangle') return new Konva.RegularPolygon({ ...cfg, x: common.x + content.width / 2, y: common.y + content.height / 2, sides: 3, radius: Math.min(content.width, content.height) / 2 });
+    if (p.shapeType === 'triangle') return new Konva.RegularPolygon({ ...cfg, x: common.x + content.width / 2, y: common.y + content.height / 2, sides: 3, radius: Math.min(content.width, content.height) / 2, offsetX: 0, offsetY: 0 });
     return new Konva.Line({ ...cfg, points: [0, content.height / 2, content.width, content.height / 2], lineCap: 'round' });
   }
 
   if (content.type === 'text') {
     const p = content.properties as TextProperties;
-    return new Konva.Text({ ...common, text: p.text, fontSize: p.fontSize, fontFamily: p.fontFamily, fontStyle: `${p.fontStyle} ${p.fontWeight}`.trim(), fill: p.color, align: p.textAlign, lineHeight: p.lineHeight, textDecoration: p.textDecoration !== 'none' ? p.textDecoration : '', padding: p.padding });
+    return new Konva.Text({ ...common, ...flip, text: p.text, fontSize: p.fontSize, fontFamily: p.fontFamily, fontStyle: `${p.fontStyle} ${p.fontWeight}`.trim(), fill: p.color, align: p.textAlign, lineHeight: p.lineHeight, textDecoration: p.textDecoration !== 'none' ? p.textDecoration : '', padding: p.padding });
   }
 
   if (content.type === 'image') {
@@ -261,7 +269,7 @@ export async function createKonvaNode(content: ZineContent, getAsset: GetAssetFn
     return new Promise((resolve, reject) => {
       const imageObj = new window.Image();
       imageObj.crossOrigin = 'anonymous';
-      imageObj.onload = () => resolve(new Konva.Image({ ...common, image: imageObj, opacity: p.opacity }));
+      imageObj.onload = () => resolve(new Konva.Image({ ...common, ...flip, image: imageObj, opacity: p.opacity, ...(p.crop ? { crop: p.crop } : {}) }));
       imageObj.onerror = () => reject(new Error(`Failed to load image from src: ${p.src}`));
       if (p.assetId) {
         getAsset(p.assetId).then(file => { if (file) imageObj.src = URL.createObjectURL(file); else reject(new Error(`Asset not found: ${p.assetId}`)); });

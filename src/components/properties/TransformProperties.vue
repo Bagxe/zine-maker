@@ -252,7 +252,7 @@ function alignBottom() {
 }
 
 function resetTransform() {
-  const updates = { x: 0, y: 0, rotation: 0 };
+  const updates = { x: 0, y: 0, rotation: 0, flipX: false, flipY: false };
   if (props.content.length === 1) {
     emit('update', props.content[0].id, updates);
   } else {
@@ -261,13 +261,17 @@ function resetTransform() {
 }
 
 function flipHorizontal() {
-  // This would implement horizontal flip
-  console.log('Flip horizontal functionality would be implemented here');
+  props.content.forEach(c => {
+    if (c.type === 'drawing') return;
+    emit('update', c.id, { flipX: !c.flipX });
+  });
 }
 
 function flipVertical() {
-  // This would implement vertical flip
-  console.log('Flip vertical functionality would be implemented here');
+  props.content.forEach(c => {
+    if (c.type === 'drawing') return;
+    emit('update', c.id, { flipY: !c.flipY });
+  });
 }
 </script>
 

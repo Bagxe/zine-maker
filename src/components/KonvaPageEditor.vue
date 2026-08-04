@@ -265,6 +265,11 @@ watch(() => projectStore.currentPage?.content, async (content) => {
       width: c.width,
       height: c.height,
       rotation: c.rotation,
+      // Mirror around the node's own bounding box when flipped
+      scaleX: c.flipX ? -1 : 1,
+      scaleY: c.flipY ? -1 : 1,
+      offsetX: c.flipX ? c.width : 0,
+      offsetY: c.flipY ? c.height : 0,
       draggable: toolsStore.activeTool === 'select' && selectedIds.value.includes(c.id)
     };
 
@@ -284,9 +289,10 @@ watch(() => projectStore.currentPage?.content, async (content) => {
         return { id: c.id, kind: 'shape', shapeType: 'rectangle', config: { ...shapeCommon, cornerRadius: p.cornerRadius || 0, visible: isVisible, draggable: toolsStore.activeTool === 'select' && isSelected && !isLocked, listening: !isLocked } };
       } else if (p.shapeType === 'circle') {
         const r = Math.min(c.width, c.height) / 2;
-        return { id: c.id, kind: 'shape', shapeType: 'circle', config: { ...shapeCommon, x: common.x + r, y: common.y + r, radius: r, visible: isVisible, draggable: toolsStore.activeTool === 'select' && isSelected && !isLocked, listening: !isLocked } };
+        // Center-based geometry: mirror around the center, not the bounding box
+        return { id: c.id, kind: 'shape', shapeType: 'circle', config: { ...shapeCommon, x: common.x + r, y: common.y + r, radius: r, offsetX: 0, offsetY: 0, visible: isVisible, draggable: toolsStore.activeTool === 'select' && isSelected && !isLocked, listening: !isLocked } };
       } else if (p.shapeType === 'triangle') {
-        return { id: c.id, kind: 'shape', shapeType: 'triangle', config: { ...shapeCommon, x: common.x + c.width / 2, y: common.y + c.height / 2, sides: 3, radius: Math.min(c.width, c.height) / 2, visible: isVisible, draggable: toolsStore.activeTool === 'select' && isSelected && !isLocked, listening: !isLocked }};
+        return { id: c.id, kind: 'shape', shapeType: 'triangle', config: { ...shapeCommon, x: common.x + c.width / 2, y: common.y + c.height / 2, sides: 3, radius: Math.min(c.width, c.height) / 2, offsetX: 0, offsetY: 0, visible: isVisible, draggable: toolsStore.activeTool === 'select' && isSelected && !isLocked, listening: !isLocked }};
       } else {
         return { id: c.id, kind: 'shape', shapeType: 'line', config: { ...shapeCommon, points: [0, c.height / 2, c.width, c.height / 2], stroke: p.stroke, strokeWidth: p.strokeWidth, lineCap: 'round', visible: isVisible, draggable: toolsStore.activeTool === 'select' && isSelected && !isLocked, listening: !isLocked } };
       }
@@ -339,6 +345,7 @@ watch(() => projectStore.currentPage?.content, async (content) => {
           ...common,
           image: imageObj,
           opacity: p.opacity,
+          ...(p.crop ? { crop: p.crop } : {}),
           visible: isVisible,
           draggable: toolsStore.activeTool === 'select' && isSelected && !isLocked,
           listening: !isLocked
@@ -766,13 +773,20 @@ onMounted(() => {
       let height = node.height() as number;
       const scaleX = node.scaleX();
       const scaleY = node.scaleY();
-      if (node.className !== 'Line' && node.className !== 'Group') {
-        width = width * scaleX;
-        height = height * scaleY;
-        node.scale({ x: 1, y: 1 });
+      const isRectLike = node.className !== 'Line' && node.className !== 'Group';
+      if (isRectLike) {
+        // A negative scale means the node is flipped; keep the sign as flip state
+        width = width * Math.abs(scaleX);
+        height = height * Math.abs(scaleY);
+        node.scale({ x: scaleX < 0 ? -1 : 1, y: scaleY < 0 ? -1 : 1 });
       }
       const pos = node.position();
-      projectStore.updateContent(id, { x: pos.x - pageBackgroundConfig.value.x, y: pos.y - pageBackgroundConfig.value.y, width, height, rotation });
+      projectStore.updateContent(id, {
+        x: pos.x - pageBackgroundConfig.value.x,
+        y: pos.y - pageBackgroundConfig.value.y,
+        width, height, rotation,
+        ...(isRectLike ? { flipX: scaleX < 0, flipY: scaleY < 0 } : {})
+      });
     });
     layer.batchDraw();
     updateOutOfBoundsWarnings();
@@ -796,13 +810,20 @@ watch(
         let height = node.height() as number;
         const scaleX = node.scaleX();
         const scaleY = node.scaleY();
-        if (node.className !== 'Line' && node.className !== 'Group') {
-          width = width * scaleX;
-          height = height * scaleY;
-          node.scale({ x: 1, y: 1 });
+        const isRectLike = node.className !== 'Line' && node.className !== 'Group';
+        if (isRectLike) {
+          // A negative scale means the node is flipped; keep the sign as flip state
+          width = width * Math.abs(scaleX);
+          height = height * Math.abs(scaleY);
+          node.scale({ x: scaleX < 0 ? -1 : 1, y: scaleY < 0 ? -1 : 1 });
         }
         const pos = node.position();
-        projectStore.updateContent(id, { x: pos.x - pageBackgroundConfig.value.x, y: pos.y - pageBackgroundConfig.value.y, width, height, rotation });
+        projectStore.updateContent(id, {
+          x: pos.x - pageBackgroundConfig.value.x,
+          y: pos.y - pageBackgroundConfig.value.y,
+          width, height, rotation,
+          ...(isRectLike ? { flipX: scaleX < 0, flipY: scaleY < 0 } : {})
+        });
       });
       layer.batchDraw();
     });

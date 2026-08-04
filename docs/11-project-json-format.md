@@ -279,6 +279,8 @@ Content objects represent elements on the page (text, images, shapes, drawings):
 - `width`, `height` - Dimensions
 - `rotation` - Rotation angle in degrees
 - `zIndex` - Stacking order
+- `flipX` - Mirrored horizontally (optional, default false)
+- `flipY` - Mirrored vertically (optional, default false)
 - `properties` - Type-specific properties object
 
 #### Text Properties
@@ -298,6 +300,7 @@ Content objects represent elements on the page (text, images, shapes, drawings):
 - `alt` - Alt text for accessibility
 - `opacity` - Opacity (0-1)
 - `assetId` - Reference to uploaded asset (optional)
+- `crop` - Source-image region to draw, in source pixels (optional): `{ "x": number, "y": number, "width": number, "height": number }`. Omitted = full image. The cropped region is stretched to fill the content box.
 
 #### Shape Properties
 - `shapeType` - Shape type (rectangle, circle, line, triangle)

@@ -54,6 +54,8 @@ export interface ZineContent {
   height: number;
   rotation: number;
   zIndex: number;
+  flipX?: boolean;
+  flipY?: boolean;
   properties: TextProperties | ImageProperties | ShapeProperties | DrawingProperties;
   visible?: boolean;
   locked?: boolean;
@@ -75,12 +77,21 @@ export interface TextProperties {
   padding: number;
 }
 
+export interface ImageCrop {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface ImageProperties {
   src: string;
   alt: string;
   opacity: number;
   filters?: string;
   assetId?: number;
+  /** Source-image region to draw, in source pixels. Undefined = full image. */
+  crop?: ImageCrop;
 }
 
 export interface ShapeProperties {
