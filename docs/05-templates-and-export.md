@@ -18,6 +18,11 @@
 - Apply optional page numbers, fold/cut marks
 - Output PNGs with pixelRatio; assemble PDF with jsPDF
 
+## Digital Export
+- Sequential PDF for screen reading: one zine page per PDF page, in reading order
+- Each page rendered at its own `pageCanvas` size — no imposition, fold/cut marks, or page numbers
+- Available in the export modal as "Digital PDF" alongside the print PDF
+
 ## Print Guidance
 - Print at 100% (Actual Size); no scaling
 - Flip on long edge for half‑fold/booklet

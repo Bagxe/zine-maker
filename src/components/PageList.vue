@@ -50,7 +50,7 @@ import { useSortable } from '@vueuse/integrations/useSortable';
 import { useProjectStore } from '@/stores/project';
 import { useUIStore } from '@/stores/ui';
 import { useAssetStore } from '@/stores/assetStore';
-import { exportZineForTemplate } from '@/composables/useZineExport';
+import { exportZineForTemplate, exportZineDigital } from '@/composables/useZineExport';
 import { ChevronRight, ChevronDown } from 'lucide-vue-next';
 
 const projectStore = useProjectStore();
@@ -109,21 +109,30 @@ async function exportZine(): Promise<void> {
     return;
   }
   try {
-    const { images, pdfData, width, height } = await exportZineForTemplate(
-      projectStore.currentProject,
-      (id) => assetStore.getAsset(id),
-      {
-        showPageNumbers: uiStore.showPageNumbers,
-        showFoldMarks: uiStore.showFoldMarks,
-        showCutMarks: uiStore.showCutMarks,
-        pixelRatio: 2,
-      }
-    );
+    const [print, digital] = await Promise.all([
+      exportZineForTemplate(
+        projectStore.currentProject,
+        (id) => assetStore.getAsset(id),
+        {
+          showPageNumbers: uiStore.showPageNumbers,
+          showFoldMarks: uiStore.showFoldMarks,
+          showCutMarks: uiStore.showCutMarks,
+          pixelRatio: 2,
+        }
+      ),
+      exportZineDigital(
+        projectStore.currentProject,
+        (id) => assetStore.getAsset(id),
+        { pixelRatio: 2 }
+      )
+    ]);
+    const { images, pdfData, width, height } = print;
     uiStore.exportImageWidth = width;
     uiStore.exportImageHeight = height;
     uiStore.exportImages = images;
     uiStore.exportImageData = images[0];
     uiStore.exportPdfData = pdfData;
+    uiStore.exportDigitalPdfData = digital.pdfData;
     uiStore.showExportModal = true;
 
   } catch (error) {

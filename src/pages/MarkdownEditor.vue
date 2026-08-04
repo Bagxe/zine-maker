@@ -182,7 +182,7 @@ import { ArrowLeft, Save, Download, FilePlus } from 'lucide-vue-next';
 import { markdownToProject, projectToMarkdown, isValidJSON, isValidZineProject } from '@/utils/markdownConverter';
 import { getMarkdownTemplate, getTemplateMarkdownExamples } from '@/utils/markdownTemplates';
 import { saveProject } from '@/utils/persistence';
-import { exportZineForTemplate } from '@/composables/useZineExport';
+import { exportZineForTemplate, exportZineDigital } from '@/composables/useZineExport';
 import { useAssetStore } from '@/stores/assetStore';
 import { useUIStore } from '@/stores/ui';
 import type { ZineProject } from '@/types';
@@ -359,21 +359,30 @@ async function exportZine() {
   if (!currentProject.value) return;
   
   try {
-    const { images, pdfData, width, height } = await exportZineForTemplate(
-      currentProject.value,
-      (id) => assetStore.getAsset(id),
-      {
-        showPageNumbers: true,
-        showFoldMarks: true,
-        showCutMarks: true,
-        pixelRatio: 2,
-      }
-    );
-    
+    const [print, digital] = await Promise.all([
+      exportZineForTemplate(
+        currentProject.value,
+        (id) => assetStore.getAsset(id),
+        {
+          showPageNumbers: true,
+          showFoldMarks: true,
+          showCutMarks: true,
+          pixelRatio: 2,
+        }
+      ),
+      exportZineDigital(
+        currentProject.value,
+        (id) => assetStore.getAsset(id),
+        { pixelRatio: 2 }
+      )
+    ]);
+    const { images, pdfData, width, height } = print;
+
     // Set export data in UI store and show modal
     uiStore.exportImages = images;
     uiStore.exportImageData = images[0];
     uiStore.exportPdfData = pdfData;
+    uiStore.exportDigitalPdfData = digital.pdfData;
     uiStore.exportImageWidth = width;
     uiStore.exportImageHeight = height;
     showExportModal.value = true;

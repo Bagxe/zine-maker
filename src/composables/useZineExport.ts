@@ -236,6 +236,65 @@ export async function exportZineForTemplate(
   }
 }
 
+export interface DigitalExportOptions {
+  pixelRatio?: number;
+}
+
+/**
+ * Digital (screen) export: each zine page rendered at its own canvas size,
+ * in reading order, as a sequential PDF (one zine page per PDF page).
+ * No imposition, fold marks, or print layout — for sharing on screens.
+ */
+export async function exportZineDigital(
+  project: ZineProject,
+  getAsset: GetAssetFn,
+  options: DigitalExportOptions = {}
+): Promise<{ images: string[]; pdfData: string; width: number; height: number }> {
+  const { useTemplatesStore } = await import('@/stores/templates');
+  const templatesStore = useTemplatesStore();
+  const template = templatesStore.getTemplate(project.template.id) || project.template as ZineTemplate;
+
+  const firstPos = template.printLayout.pagePositions[0];
+  const pageWidth = template.pageCanvas?.width ?? firstPos.width;
+  const pageHeight = template.pageCanvas?.height ?? firstPos.height;
+  const pixelRatio = options.pixelRatio ?? 2;
+
+  const tempContainer = document.createElement('div');
+  tempContainer.style.position = 'absolute';
+  tempContainer.style.left = '-9999px';
+  tempContainer.style.top = '-9999px';
+  tempContainer.style.width = `${pageWidth}px`;
+  tempContainer.style.height = `${pageHeight}px`;
+  document.body.appendChild(tempContainer);
+
+  const stage = new Konva.Stage({ container: tempContainer, width: pageWidth, height: pageHeight });
+  const layer = new Konva.Layer();
+  stage.add(layer);
+
+  try {
+    const images: string[] = [];
+    const pages = [...project.pages].sort((a, b) => a.pageNumber - b.pageNumber);
+    for (const page of pages) {
+      layer.destroyChildren();
+      layer.add(new Konva.Rect({ x: 0, y: 0, width: pageWidth, height: pageHeight, fill: page.backgroundColor || 'white', listening: false }));
+
+      const sorted = [...page.content].sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
+      // Await all nodes, then append in zIndex order (see exportZineForTemplate)
+      const nodes = await Promise.all(sorted.map(content => createKonvaNode(content, getAsset).catch(() => null)));
+      for (const node of nodes) { if (node) layer.add(node as Konva.Shape); }
+
+      await new Promise<void>(resolve => { layer.draw(); requestAnimationFrame(() => setTimeout(resolve, 40)); });
+      images.push(stage.toDataURL({ x: 0, y: 0, width: pageWidth, height: pageHeight, pixelRatio }));
+    }
+
+    const pdfData = await generatePDF(images, pageWidth, pageHeight);
+    return { images, pdfData, width: pageWidth * pixelRatio, height: pageHeight * pixelRatio };
+  } finally {
+    stage.destroy();
+    document.body.removeChild(tempContainer);
+  }
+}
+
 export async function createKonvaNode(content: ZineContent, getAsset: GetAssetFn): Promise<Konva.Node | null> {
   const common = { x: content.x, y: content.y, width: content.width, height: content.height, rotation: content.rotation } as const;
   // Mirror around the node's own bounding box when flipped

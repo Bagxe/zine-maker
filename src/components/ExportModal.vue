@@ -21,7 +21,14 @@
           :class="{ active: activeTab === 'pdf' }"
           class="tab-button"
         >
-          PDF Preview
+          Print PDF
+        </button>
+        <button 
+          @click="activeTab = 'digital'" 
+          :class="{ active: activeTab === 'digital' }"
+          class="tab-button"
+        >
+          Digital PDF
         </button>
       </div>
 
@@ -35,13 +42,13 @@
           <p class="debug">No images generated</p>
         </div>
         <iframe 
-          v-else-if="activeTab === 'pdf' && pdfSrc" 
-          :src="pdfSrc" 
+          v-else-if="(activeTab === 'pdf' || activeTab === 'digital') && currentPdfSrc" 
+          :src="currentPdfSrc" 
           class="pdf-preview"
         ></iframe>
         <div v-else class="no-preview">
           <p>PDF preview not available</p>
-          <p class="debug">PDF data length: {{ pdfSrc ? pdfSrc.length : 0 }}</p>
+          <p class="debug">PDF data length: {{ currentPdfSrc ? currentPdfSrc.length : 0 }}</p>
         </div>
       </div>
 
@@ -58,7 +65,11 @@
         </button>
         <button @click="downloadPdf" class="download-button pdf-button">
           <FileText :size="16" />
-          <span>Download PDF</span>
+          <span>Print PDF</span>
+        </button>
+        <button @click="downloadDigitalPdf" class="download-button digital-button" :disabled="!uiStore.exportDigitalPdfData">
+          <Smartphone :size="16" />
+          <span>Digital PDF</span>
         </button>
       </div>
 
@@ -76,7 +87,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { Download, FileText } from 'lucide-vue-next';
+import { Download, FileText, Smartphone } from 'lucide-vue-next';
 import { useUIStore } from '@/stores/ui';
 
 const props = defineProps<{ visible: boolean; imageSrc: string }>();
@@ -86,7 +97,7 @@ defineEmits<{
 }>();
 
 const uiStore = useUIStore();
-const activeTab = ref<'png' | 'pdf'>('png');
+const activeTab = ref<'png' | 'pdf' | 'digital'>('png');
 const pageIndex = ref(0);
 const currentPng = computed(() => uiStore.exportImages.length ? uiStore.exportImages[pageIndex.value] : props.imageSrc);
 
@@ -98,9 +109,8 @@ const sideLabel = computed(() => {
   return 'Sheet';
 });
 
-const pdfSrc = computed(() => {
-  // If exportPdfData is a data URL, convert to blob URL for better iframe compatibility
-  const data = uiStore.exportPdfData;
+// Convert a PDF data URL to a blob URL for better iframe compatibility
+function toPdfObjectUrl(data: string): string | null {
   if (!data) return null;
   if (data.startsWith('data:application/pdf')) {
     try {
@@ -116,7 +126,11 @@ const pdfSrc = computed(() => {
     }
   }
   return data;
-});
+}
+
+const pdfSrc = computed(() => toPdfObjectUrl(uiStore.exportPdfData));
+const digitalPdfSrc = computed(() => toPdfObjectUrl(uiStore.exportDigitalPdfData));
+const currentPdfSrc = computed(() => activeTab.value === 'digital' ? digitalPdfSrc.value : pdfSrc.value);
 
 function downloadPng() {
   const link = document.createElement('a');
@@ -129,7 +143,16 @@ function downloadPdf() {
   if (uiStore.exportPdfData) {
     const link = document.createElement('a');
     link.href = uiStore.exportPdfData;
-    link.download = 'zine-export.pdf';
+    link.download = 'zine-print.pdf';
+    link.click();
+  }
+}
+
+function downloadDigitalPdf() {
+  if (uiStore.exportDigitalPdfData) {
+    const link = document.createElement('a');
+    link.href = uiStore.exportDigitalPdfData;
+    link.download = 'zine-digital.pdf';
     link.click();
   }
 }
@@ -304,6 +327,20 @@ function downloadPdf() {
 
 .pdf-button:hover {
   background: #b91c1c;
+}
+
+.digital-button {
+  background: #2563eb;
+  color: white;
+}
+
+.digital-button:hover {
+  background: #1d4ed8;
+}
+
+.digital-button:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
 }
 
 .print-instructions {

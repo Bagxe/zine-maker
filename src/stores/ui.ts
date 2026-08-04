@@ -13,6 +13,7 @@ export const useUIStore = defineStore('ui', () => {
   const exportImageWidth = ref(0);
   const exportImageHeight = ref(0);
   const exportPdfData = ref('');
+  const exportDigitalPdfData = ref('');
   const zoom = ref(1);
   const canvasOffset = ref({ x: 0, y: 0 });
   const shouldFit = ref(false);
@@ -84,6 +85,7 @@ export const useUIStore = defineStore('ui', () => {
     exportImageWidth,
     exportImageHeight,
     exportPdfData,
+    exportDigitalPdfData,
     zoom,
     canvasOffset,
     shouldFit,
