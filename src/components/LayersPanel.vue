@@ -9,7 +9,7 @@
     </div>
 
     <ul class="layer-list">
-      <li v-for="layer in layers" :key="layer.id"
+      <li v-for="(layer, index) in layers" :key="layer.id"
           class="layer-item"
           :class="{ selected: isSelected(layer.id), locked: !!layer.locked }"
           draggable="true"
@@ -29,6 +29,12 @@
         </div>
         <div class="name">{{ layer.name || defaultName(layer) }}</div>
         <div class="right">
+          <button class="icon" @click.stop="moveLayer(layer.id, -1)" :disabled="index === 0" title="Move backward">
+            <ArrowUp :size="16" />
+          </button>
+          <button class="icon" @click.stop="moveLayer(layer.id, 1)" :disabled="index === layers.length - 1" title="Move forward">
+            <ArrowDown :size="16" />
+          </button>
           <span class="type">{{ layer.type }}</span>
         </div>
       </li>
@@ -40,7 +46,7 @@
 import { computed, ref } from 'vue';
 import { useProjectStore } from '@/stores/project';
 import type { ZineContent } from '@/types';
-import { Eye, EyeOff, Lock, Unlock } from 'lucide-vue-next';
+import { Eye, EyeOff, Lock, Unlock, ArrowUp, ArrowDown } from 'lucide-vue-next';
 
 const projectStore = useProjectStore();
 
@@ -88,6 +94,17 @@ function onDrop(targetId: string) {
   projectStore.reorderContent(ordered);
 }
 
+// Touch-friendly reordering: move one step in the list (back-to-front order).
+function moveLayer(id: string, delta: number) {
+  const ordered = layers.value.map(l => l.id);
+  const fromIdx = ordered.indexOf(id);
+  const toIdx = fromIdx + delta;
+  if (fromIdx === -1 || toIdx < 0 || toIdx >= ordered.length) return;
+  ordered.splice(fromIdx, 1);
+  ordered.splice(toIdx, 0, id);
+  projectStore.reorderContent(ordered);
+}
+
 function groupSelected() {
   projectStore.groupSelected();
 }
@@ -123,9 +140,11 @@ function ungroupSelected() {
 .layer-item.selected { outline: 2px solid #3b82f6; }
 .layer-item.locked { opacity: 0.7; }
 .left { display: flex; gap: 0.25rem; }
-.right { color: #9ca3af; font-size: 0.75rem; }
+.right { display: flex; align-items: center; gap: 0.25rem; color: #9ca3af; font-size: 0.75rem; }
 .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .icon { border: 1px solid #e5e7eb; background: #f9fafb; border-radius: 4px; padding: 0.1rem 0.3rem; cursor: pointer; }
 .icon:hover { background: #eef2ff; }
+.icon:disabled { opacity: 0.4; cursor: default; }
+.icon:disabled:hover { background: #f9fafb; }
 </style>
 

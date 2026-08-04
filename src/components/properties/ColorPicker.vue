@@ -1,12 +1,12 @@
 <template>
   <div class="color-picker">
-    <div class="color-preview" :style="{ backgroundColor: value }" @click="togglePicker">
-      <input 
-        ref="colorInput"
-        type="color" 
+    <div class="color-preview" :style="{ backgroundColor: value }">
+      <input
+        type="color"
         :value="value"
         @input="updateColor"
         class="hidden-input"
+        :aria-label="'Pick color'"
       />
     </div>
     <input 
@@ -24,7 +24,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Slash } from 'lucide-vue-next';
 
 interface Props {
@@ -37,12 +36,6 @@ interface Emits {
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
-
-const colorInput = ref<HTMLInputElement | null>(null);
-
-function togglePicker() {
-  colorInput.value?.click();
-}
 
 function setTransparent() {
   emit('update', 'transparent');
@@ -110,12 +103,15 @@ function validateColor(event: Event) {
   background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
 }
 
+/* Invisible but tappable: the input overlays the swatch so taps open the
+   native color picker directly (required on mobile browsers). */
 .hidden-input {
   position: absolute;
+  inset: 0;
   opacity: 0;
-  pointer-events: none;
   width: 100%;
   height: 100%;
+  cursor: pointer;
 }
 
 .color-text {
