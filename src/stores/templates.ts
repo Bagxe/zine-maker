@@ -295,6 +295,145 @@ export const useTemplatesStore = defineStore('templates', () => {
       },
       pageCanvas: { width: 842/2, height: 595 }
     }
+    ,
+    // Eighth-fold and quarter-duplex layouts below were generated with the
+    // Zine Arranger imposition engine (MIT, (c) 2024 Nash High) as ported in
+    // zine-studio's zineArrangerData — see zine-studio LICENSE-zine-arranger.txt
+    {
+      id: 'eighth-fold-letter',
+      name: 'Eighth Fold Minizine (Letter, 16 pages)',
+      format: 'eighth-fold',
+      pageSize: 'letter',
+      orientation: 'landscape',
+      pageCount: 16,
+      description: 'Double-sided 16-page minizine from a single letter-size sheet',
+      foldInstructions: 'Print double-sided (flip on long edge). Fold into eighths, cut the center slit, then fold into a booklet.',
+      printLayout: {
+        // US Letter landscape 11x8.5 at 72 DPI, 4x2 grid
+        sheetWidth: 792,
+        sheetHeight: 612,
+        pagePositions: [
+          // Front, top row (upside down): 5, 12, 9, 8
+          { pageNumber: 5,  x: 0,       y: 0,      width: 792/4, height: 612/2, rotation: 180, isFlipped: false, side: 'front' },
+          { pageNumber: 12, x: 792/4,   y: 0,      width: 792/4, height: 612/2, rotation: 180, isFlipped: false, side: 'front' },
+          { pageNumber: 9,  x: 792/2,   y: 0,      width: 792/4, height: 612/2, rotation: 180, isFlipped: false, side: 'front' },
+          { pageNumber: 8,  x: 792*3/4, y: 0,      width: 792/4, height: 612/2, rotation: 180, isFlipped: false, side: 'front' },
+          // Front, bottom row (right side up): 4, 13, 16, 1
+          { pageNumber: 4,  x: 0,       y: 612/2,  width: 792/4, height: 612/2, rotation: 0, isFlipped: false, side: 'front' },
+          { pageNumber: 13, x: 792/4,   y: 612/2,  width: 792/4, height: 612/2, rotation: 0, isFlipped: false, side: 'front' },
+          { pageNumber: 16, x: 792/2,   y: 612/2,  width: 792/4, height: 612/2, rotation: 0, isFlipped: false, side: 'front' },
+          { pageNumber: 1,  x: 792*3/4, y: 612/2,  width: 792/4, height: 612/2, rotation: 0, isFlipped: false, side: 'front' },
+          // Back, top row (upside down): 7, 10, 11, 6
+          { pageNumber: 7,  x: 0,       y: 0,      width: 792/4, height: 612/2, rotation: 180, isFlipped: false, side: 'back' },
+          { pageNumber: 10, x: 792/4,   y: 0,      width: 792/4, height: 612/2, rotation: 180, isFlipped: false, side: 'back' },
+          { pageNumber: 11, x: 792/2,   y: 0,      width: 792/4, height: 612/2, rotation: 180, isFlipped: false, side: 'back' },
+          { pageNumber: 6,  x: 792*3/4, y: 0,      width: 792/4, height: 612/2, rotation: 180, isFlipped: false, side: 'back' },
+          // Back, bottom row (right side up): 2, 15, 14, 3
+          { pageNumber: 2,  x: 0,       y: 612/2,  width: 792/4, height: 612/2, rotation: 0, isFlipped: false, side: 'back' },
+          { pageNumber: 15, x: 792/4,   y: 612/2,  width: 792/4, height: 612/2, rotation: 0, isFlipped: false, side: 'back' },
+          { pageNumber: 14, x: 792/2,   y: 612/2,  width: 792/4, height: 612/2, rotation: 0, isFlipped: false, side: 'back' },
+          { pageNumber: 3,  x: 792*3/4, y: 612/2,  width: 792/4, height: 612/2, rotation: 0, isFlipped: false, side: 'back' }
+        ]
+      },
+      pageCanvas: { width: 792/4, height: 612/2 }
+    }
+    ,
+    {
+      id: 'eighth-fold-din-a4',
+      name: 'Eighth Fold Minizine (DIN A4, 16 pages)',
+      format: 'eighth-fold',
+      pageSize: 'a4',
+      orientation: 'landscape',
+      pageCount: 16,
+      description: 'Double-sided 16-page minizine from a single DIN A4-size sheet',
+      foldInstructions: 'Print double-sided (flip on long edge). Fold into eighths, cut the center slit, then fold into a booklet.',
+      printLayout: {
+        // DIN A4 landscape at 72 DPI, 4x2 grid
+        sheetWidth: 842,
+        sheetHeight: 595,
+        pagePositions: [
+          // Front, top row (upside down): 5, 12, 9, 8
+          { pageNumber: 5,  x: 0,       y: 0,      width: 842/4, height: 595/2, rotation: 180, isFlipped: false, side: 'front' },
+          { pageNumber: 12, x: 842/4,   y: 0,      width: 842/4, height: 595/2, rotation: 180, isFlipped: false, side: 'front' },
+          { pageNumber: 9,  x: 842/2,   y: 0,      width: 842/4, height: 595/2, rotation: 180, isFlipped: false, side: 'front' },
+          { pageNumber: 8,  x: 842*3/4, y: 0,      width: 842/4, height: 595/2, rotation: 180, isFlipped: false, side: 'front' },
+          // Front, bottom row (right side up): 4, 13, 16, 1
+          { pageNumber: 4,  x: 0,       y: 595/2,  width: 842/4, height: 595/2, rotation: 0, isFlipped: false, side: 'front' },
+          { pageNumber: 13, x: 842/4,   y: 595/2,  width: 842/4, height: 595/2, rotation: 0, isFlipped: false, side: 'front' },
+          { pageNumber: 16, x: 842/2,   y: 595/2,  width: 842/4, height: 595/2, rotation: 0, isFlipped: false, side: 'front' },
+          { pageNumber: 1,  x: 842*3/4, y: 595/2,  width: 842/4, height: 595/2, rotation: 0, isFlipped: false, side: 'front' },
+          // Back, top row (upside down): 7, 10, 11, 6
+          { pageNumber: 7,  x: 0,       y: 0,      width: 842/4, height: 595/2, rotation: 180, isFlipped: false, side: 'back' },
+          { pageNumber: 10, x: 842/4,   y: 0,      width: 842/4, height: 595/2, rotation: 180, isFlipped: false, side: 'back' },
+          { pageNumber: 11, x: 842/2,   y: 0,      width: 842/4, height: 595/2, rotation: 180, isFlipped: false, side: 'back' },
+          { pageNumber: 6,  x: 842*3/4, y: 0,      width: 842/4, height: 595/2, rotation: 180, isFlipped: false, side: 'back' },
+          // Back, bottom row (right side up): 2, 15, 14, 3
+          { pageNumber: 2,  x: 0,       y: 595/2,  width: 842/4, height: 595/2, rotation: 0, isFlipped: false, side: 'back' },
+          { pageNumber: 15, x: 842/4,   y: 595/2,  width: 842/4, height: 595/2, rotation: 0, isFlipped: false, side: 'back' },
+          { pageNumber: 14, x: 842/2,   y: 595/2,  width: 842/4, height: 595/2, rotation: 0, isFlipped: false, side: 'back' },
+          { pageNumber: 3,  x: 842*3/4, y: 595/2,  width: 842/4, height: 595/2, rotation: 0, isFlipped: false, side: 'back' }
+        ]
+      },
+      pageCanvas: { width: 842/4, height: 595/2 }
+    }
+    ,
+    {
+      id: 'quarter-duplex-letter',
+      name: 'Quarter Zine, Two-Sided (Letter, 8 pages)',
+      format: 'quarter-duplex',
+      pageSize: 'letter',
+      orientation: 'portrait',
+      pageCount: 8,
+      description: 'Double-sided 8-page quarter-size zine from a single letter-size sheet',
+      foldInstructions: 'Print double-sided (flip on long edge). Fold into quarters and staple or trim at the spine.',
+      printLayout: {
+        // US Letter portrait 8.5x11 at 72 DPI, 2x2 grid
+        sheetWidth: 612,
+        sheetHeight: 792,
+        pagePositions: [
+          // Front: [8|1] over [6|3]
+          { pageNumber: 8, x: 0,     y: 0,     width: 612/2, height: 792/2, rotation: 0, isFlipped: false, side: 'front' },
+          { pageNumber: 1, x: 612/2, y: 0,     width: 612/2, height: 792/2, rotation: 0, isFlipped: false, side: 'front' },
+          { pageNumber: 6, x: 0,     y: 792/2, width: 612/2, height: 792/2, rotation: 0, isFlipped: false, side: 'front' },
+          { pageNumber: 3, x: 612/2, y: 792/2, width: 612/2, height: 792/2, rotation: 0, isFlipped: false, side: 'front' },
+          // Back: [2|7] over [4|5]
+          { pageNumber: 2, x: 0,     y: 0,     width: 612/2, height: 792/2, rotation: 0, isFlipped: false, side: 'back' },
+          { pageNumber: 7, x: 612/2, y: 0,     width: 612/2, height: 792/2, rotation: 0, isFlipped: false, side: 'back' },
+          { pageNumber: 4, x: 0,     y: 792/2, width: 612/2, height: 792/2, rotation: 0, isFlipped: false, side: 'back' },
+          { pageNumber: 5, x: 612/2, y: 792/2, width: 612/2, height: 792/2, rotation: 0, isFlipped: false, side: 'back' }
+        ]
+      },
+      pageCanvas: { width: 612/2, height: 792/2 }
+    }
+    ,
+    {
+      id: 'quarter-duplex-din-a4',
+      name: 'Quarter Zine, Two-Sided (DIN A4, 8 pages)',
+      format: 'quarter-duplex',
+      pageSize: 'a4',
+      orientation: 'portrait',
+      pageCount: 8,
+      description: 'Double-sided 8-page quarter-size zine from a single DIN A4-size sheet',
+      foldInstructions: 'Print double-sided (flip on long edge). Fold into quarters and staple or trim at the spine.',
+      printLayout: {
+        // DIN A4 portrait at 72 DPI, 2x2 grid
+        sheetWidth: 595,
+        sheetHeight: 842,
+        pagePositions: [
+          // Front: [8|1] over [6|3]
+          { pageNumber: 8, x: 0,     y: 0,     width: 595/2, height: 842/2, rotation: 0, isFlipped: false, side: 'front' },
+          { pageNumber: 1, x: 595/2, y: 0,     width: 595/2, height: 842/2, rotation: 0, isFlipped: false, side: 'front' },
+          { pageNumber: 6, x: 0,     y: 842/2, width: 595/2, height: 842/2, rotation: 0, isFlipped: false, side: 'front' },
+          { pageNumber: 3, x: 595/2, y: 842/2, width: 595/2, height: 842/2, rotation: 0, isFlipped: false, side: 'front' },
+          // Back: [2|7] over [4|5]
+          { pageNumber: 2, x: 0,     y: 0,     width: 595/2, height: 842/2, rotation: 0, isFlipped: false, side: 'back' },
+          { pageNumber: 7, x: 595/2, y: 0,     width: 595/2, height: 842/2, rotation: 0, isFlipped: false, side: 'back' },
+          { pageNumber: 4, x: 0,     y: 842/2, width: 595/2, height: 842/2, rotation: 0, isFlipped: false, side: 'back' },
+          { pageNumber: 5, x: 595/2, y: 842/2, width: 595/2, height: 842/2, rotation: 0, isFlipped: false, side: 'back' }
+        ]
+      },
+      pageCanvas: { width: 595/2, height: 842/2 }
+    }
   ]);
 
   const selectedTemplate = ref<ZineTemplate | null>(null);

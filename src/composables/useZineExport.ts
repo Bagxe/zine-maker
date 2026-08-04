@@ -186,7 +186,8 @@ export async function exportZineForTemplate(
         const sheetBack = await renderSide('back', backPositions as any);
         images.push(sheetFront, sheetBack);
       }
-    } else if (template.format === 'half-fold') {
+    } else if (template.format === 'half-fold' || template.format === 'eighth-fold' || template.format === 'quarter-duplex') {
+      // Single sheet, duplex: render front and back sides from template positions
       const front = await renderSide('front', template.printLayout.pagePositions.filter(p => p.side === 'front'));
       const back = await renderSide('back', template.printLayout.pagePositions.filter(p => p.side === 'back'));
       images.push(front, back);

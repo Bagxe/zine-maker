@@ -4,6 +4,8 @@
 - Quarter‑fold (Letter): 8 pages on a single sheet; one‑sided export; slit cut across center from 1/4 to 3/4 width
 - Half‑fold (Letter): 4 pages; double‑sided export (front/back)
 - Booklet (Letter): 16 pages; multiple sheets; each sheet has front/back spreads (outer to inner)
+- Eighth‑fold minizine (Letter/A4): 16 pages on a single sheet; double‑sided export (front/back); top rows upside‑down; imposition generated with the Zine Arranger engine (MIT)
+- Quarter zine, two‑sided (Letter/A4): 8 pages on a single portrait sheet; double‑sided export (front/back); imposition generated with the Zine Arranger engine (MIT)
 
 ## Imposition
 - Quarter‑fold: top row upside‑down; bottom row right‑side; fold marks optional; single side
