@@ -7,7 +7,7 @@
         @click="handleToolClick(tool.id)"
         :class="{ active: toolsStore.activeTool === tool.id }"
         class="tool-button"
-        :title="`${tool.name} (${tool.shortcut})`"
+        :title="`${t('tools.' + tool.id)} (${tool.shortcut})`"
       >
         <component :is="tool.icon" :size="20" stroke-width="2" />
         <div v-if="tool.id === 'shape'" class="dropdown-arrow"></div>
@@ -16,7 +16,7 @@
       <div v-if="isShapePopoverVisible" class="shape-popover" ref="shapePopoverRef">
         <button v-for="shape in availableShapes" :key="shape.type" @click="selectShape(shape.type)" class="shape-select-button">
           <component :is="shape.icon" :size="18" />
-          <span>{{ shape.name }}</span>
+          <span>{{ t('shapes.' + shape.type) }}</span>
         </button>
       </div>
 
@@ -24,7 +24,7 @@
       <div v-if="false" class="drawing-toolbar">
         <div class="drawing-controls">
           <div class="control-group">
-            <label>Size</label>
+            <label>{{ t('tools.size') }}</label>
             <input 
               type="range"
               :value="toolsStore.drawingSettings.strokeWidth"
@@ -36,7 +36,7 @@
             <span class="size-value">{{ toolsStore.drawingSettings.strokeWidth }}px</span>
           </div>
           <div class="control-group">
-            <label>Color</label>
+            <label>{{ t('tools.color') }}</label>
             <input 
               type="color"
               :value="toolsStore.drawingSettings.strokeColor"
@@ -45,7 +45,7 @@
             />
           </div>
           <div class="control-group">
-            <label>Opacity</label>
+            <label>{{ t('tools.opacity') }}</label>
             <input 
               type="range"
               :value="toolsStore.drawingSettings.opacity * 100"
@@ -62,14 +62,14 @@
       
       
       <div class="history-controls">
-        <button class="tool-button" :disabled="!projectStoreCanUndo" @click="undo" title="Undo (⌘/Ctrl+Z)">
+        <button class="tool-button" :disabled="!projectStoreCanUndo" @click="undo" :title="t('tools.undo')">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-5-5 5-5"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
         </button>
-        <button class="tool-button" :disabled="!projectStoreCanRedo" @click="redo" title="Redo (⇧+⌘/Ctrl+Z)">
+        <button class="tool-button" :disabled="!projectStoreCanRedo" @click="redo" :title="t('tools.redo')">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg>
         </button>
       </div>
-      <button class="tool-button trash-button" :class="{ active: hasSelection }" :disabled="!hasSelection" @click="deleteSelected" title="Delete selected" ref="trashZoneRef">
+      <button class="tool-button trash-button" :class="{ active: hasSelection }" :disabled="!hasSelection" @click="deleteSelected" :title="t('tools.deleteSelected')" ref="trashZoneRef">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
       </button>
     </div>
@@ -77,7 +77,7 @@
   <div v-if="toolsStore.activeTool === 'draw'" class="drawing-toolbar below">
     <div class="drawing-controls">
       <div class="control-group">
-        <label>Size</label>
+        <label>{{ t('tools.size') }}</label>
         <input 
           type="range"
           :value="toolsStore.drawingSettings.strokeWidth"
@@ -89,7 +89,7 @@
         <span class="size-value">{{ toolsStore.drawingSettings.strokeWidth }}px</span>
       </div>
       <div class="control-group">
-        <label>Color</label>
+        <label>{{ t('tools.color') }}</label>
         <input 
           type="color"
           :value="toolsStore.drawingSettings.strokeColor"
@@ -98,7 +98,7 @@
         />
       </div>
       <div class="control-group">
-        <label>Opacity</label>
+        <label>{{ t('tools.opacity') }}</label>
         <input 
           type="range"
           :value="toolsStore.drawingSettings.opacity * 100"
@@ -115,6 +115,7 @@
 
 <script setup lang="ts">
 import { ref, markRaw, type Component, computed, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useToolsStore } from '@/stores/tools';
 import { useUIStore } from '@/stores/ui';
 import { onClickOutside } from '@vueuse/core';
@@ -122,6 +123,7 @@ import type { ShapeProperties, ToolType } from '@/types';
 import { Square, Circle, Minus, Triangle } from 'lucide-vue-next';
 import { useProjectStore } from '@/stores/project';
 
+const { t } = useI18n();
 const toolsStore = useToolsStore();
 const uiStore = useUIStore();
 const projectStore = useProjectStore();
@@ -260,7 +262,7 @@ function updateDrawingSetting(key: string, value: any) {
 .dropdown-arrow {
   position: absolute;
   bottom: 4px;
-  right: 4px;
+  inset-inline-end: 4px;
   width: 0;
   height: 0;
   border-left: 3px solid transparent;
@@ -271,7 +273,7 @@ function updateDrawingSetting(key: string, value: any) {
 .shape-popover {
   position: absolute;
   top: calc(100% + 4px);
-  left: 140px; /* Adjust based on shape tool position */
+  inset-inline-start: 140px; /* Adjust based on shape tool position */
   background: var(--panel);
   border: 1px solid var(--border-soft);
   border-radius: 6px;
@@ -292,7 +294,7 @@ function updateDrawingSetting(key: string, value: any) {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  text-align: left;
+  text-align: start;
   font-size: 0.85rem;
   width: 100%;
 }
@@ -302,7 +304,7 @@ function updateDrawingSetting(key: string, value: any) {
 }
 
 .drawing-toolbar {
-  margin-left: 1rem;
+  margin-inline-start: 1rem;
   padding: 0.5rem 1rem;
   background: var(--surface);
   border: 1px solid var(--border-soft);
@@ -366,11 +368,11 @@ function updateDrawingSetting(key: string, value: any) {
 }
 
 /* history controls match toolbar */
-.history-controls { display: flex; gap: 0.25rem; margin-left: 0.5rem; }
+.history-controls { display: flex; gap: 0.25rem; margin-inline-start: 0.5rem; }
 .history-controls .tool-button[disabled] { opacity: 0.4; cursor: not-allowed; }
 
 /* Trash button */
-.trash-button { margin-left: auto; border: 1px solid var(--border-soft); }
+.trash-button { margin-inline-start: auto; border: 1px solid var(--border-soft); }
 .trash-button.active { background: #fee2e2; color: #b91c1c; border-color: #ef4444; }
 .trash-button:disabled { opacity: 0.5; cursor: not-allowed; }
 

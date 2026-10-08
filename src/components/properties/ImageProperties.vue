@@ -1,9 +1,9 @@
 <template>
   <div class="image-properties">
     <div class="property-section">
-      <h4>Image</h4>
+      <h4>{{ t('props.image') }}</h4>
       <div class="property-group">
-        <label>Source</label>
+        <label>{{ t('props.source') }}</label>
         <div class="image-source">
           <div class="image-preview">
             <img :src="imageProps.src" :alt="imageProps.alt" @load="onPreviewLoad" />
@@ -17,28 +17,28 @@
               class="hidden-input"
             />
             <button @click="selectNewImage" class="change-button">
-              Change Image
+              {{ t('props.changeImage') }}
             </button>
           </div>
         </div>
       </div>
 
       <div class="property-group">
-        <label>Alt Text</label>
+        <label>{{ t('props.altText') }}</label>
         <input 
           type="text"
           :value="imageProps.alt"
           @input="updateProperty('alt', ($event.target as HTMLInputElement).value)"
           class="text-input"
-          placeholder="Describe the image"
+          :placeholder="t('props.altPlaceholder')"
         />
       </div>
     </div>
 
     <div class="property-section">
-      <h4>Appearance</h4>
+      <h4>{{ t('props.appearance') }}</h4>
       <div class="property-group">
-        <label>Opacity</label>
+        <label>{{ t('props.opacity') }}</label>
         <div class="opacity-control">
           <input 
             type="range"
@@ -53,25 +53,25 @@
       </div>
 
       <div class="property-group" v-if="imageProps.filters">
-        <label>Filters</label>
+        <label>{{ t('props.filters') }}</label>
         <select 
           :value="imageProps.filters || 'none'"
           @change="updateProperty('filters', ($event.target as HTMLSelectElement).value === 'none' ? undefined : ($event.target as HTMLSelectElement).value)"
           class="select-input"
         >
-          <option value="none">None</option>
-          <option value="grayscale(100%)">Grayscale</option>
-          <option value="sepia(100%)">Sepia</option>
-          <option value="blur(2px)">Blur</option>
-          <option value="brightness(150%)">Bright</option>
-          <option value="contrast(150%)">High Contrast</option>
-          <option value="saturate(200%)">Saturated</option>
+          <option value="none">{{ t('props.filterNone') }}</option>
+          <option value="grayscale(100%)">{{ t('props.filterGrayscale') }}</option>
+          <option value="sepia(100%)">{{ t('props.filterSepia') }}</option>
+          <option value="blur(2px)">{{ t('props.filterBlur') }}</option>
+          <option value="brightness(150%)">{{ t('props.filterBright') }}</option>
+          <option value="contrast(150%)">{{ t('props.filterHighContrast') }}</option>
+          <option value="saturate(200%)">{{ t('props.filterSaturated') }}</option>
         </select>
       </div>
     </div>
 
     <div class="property-section" v-if="naturalSize">
-      <h4>Crop</h4>
+      <h4>{{ t('props.crop') }}</h4>
       <div class="property-row">
         <div class="property-group">
           <label>X</label>
@@ -96,7 +96,7 @@
       </div>
       <div class="property-row">
         <div class="property-group">
-          <label>Width</label>
+          <label>{{ t('props.width') }}</label>
           <NumberInput
             :value="cropData.width"
             @update="updateCrop('width', $event)"
@@ -106,7 +106,7 @@
           />
         </div>
         <div class="property-group">
-          <label>Height</label>
+          <label>{{ t('props.height') }}</label>
           <NumberInput
             :value="cropData.height"
             @update="updateCrop('height', $event)"
@@ -116,20 +116,20 @@
           />
         </div>
       </div>
-      <p class="crop-hint">Source pixels — the cropped region fills the image box.</p>
+      <p class="crop-hint">{{ t('props.cropHint') }}</p>
       <button v-if="imageProps.crop" @click="resetCrop" class="action-button">
-        Reset Crop
+        {{ t('props.resetCrop') }}
       </button>
     </div>
 
     <div class="property-section">
-      <h4>Actions</h4>
+      <h4>{{ t('props.actions') }}</h4>
       <div class="property-group">
         <button @click="resetImage" class="action-button">
-          Reset to Original
+          {{ t('props.resetToOriginal') }}
         </button>
         <button @click="duplicateImage" class="action-button">
-          Duplicate Image
+          {{ t('props.duplicateImage') }}
         </button>
       </div>
     </div>
@@ -138,6 +138,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { ZineContent, ImageProperties, ImageCrop } from '@/types';
 import { useProjectStore } from '@/stores/project';
 import NumberInput from './NumberInput.vue';
@@ -150,6 +151,7 @@ interface Emits {
   update: [contentId: string, updates: Partial<ZineContent>];
 }
 
+const { t } = useI18n();
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 

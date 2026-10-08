@@ -1,19 +1,19 @@
 <template>
   <div class="modal-overlay" @click.self="close">
     <div class="modal" role="dialog" aria-labelledby="projectsTitle">
-      <button class="close-button close-button--red" @click="close" aria-label="Close">×</button>
+      <button class="close-button close-button--red" @click="close" :aria-label="t('common.close')">×</button>
       <header class="modal-header">
-        <h2 id="projectsTitle">Projects</h2>
+        <h2 id="projectsTitle">{{ t('projects.title') }}</h2>
       </header>
       <section class="modal-body">
         <div class="backup-bar">
-          <button class="btn" @click="exportAll">Download All Projects</button>
-          <button class="btn" @click="importInput?.click()">Upload All Projects</button>
+          <button class="btn" @click="exportAll">{{ t('projects.downloadAll') }}</button>
+          <button class="btn" @click="importInput?.click()">{{ t('projects.uploadAll') }}</button>
           <input ref="importInput" type="file" accept="application/json" @change="importAll" style="display:none" />
-          <button class="btn" @click="importOneInput?.click()">Upload Single Project</button>
+          <button class="btn" @click="importOneInput?.click()">{{ t('projects.uploadSingle') }}</button>
           <input ref="importOneInput" type="file" accept="application/json" @change="importSingle" style="display:none" />
-          <button class="btn" @click="toggleSamples">Browse Sample Zines</button>
-          <button class="btn btn-danger" @click="openDeleteAll">Delete All</button>
+          <button class="btn" @click="toggleSamples">{{ t('projects.browseSamples') }}</button>
+          <button class="btn btn-danger" @click="openDeleteAll">{{ t('projects.deleteAll') }}</button>
         </div>
 
         <div v-if="showSamples" class="samples-grid">
@@ -23,7 +23,7 @@
               <div class="sample-desc">{{ s.description }}</div>
             </div>
             <div class="sample-actions">
-              <button class="btn" @click="loadSample(s.id)">Create from Sample</button>
+              <button class="btn" @click="loadSample(s.id)">{{ t('projects.createFromSample') }}</button>
             </div>
           </div>
         </div>
@@ -32,28 +32,28 @@
           <li v-for="project in projects" :key="project.id" class="project-item">
             <div class="info">
               <div class="name">{{ project.name }}</div>
-              <div class="meta">Updated {{ formatDate(project.modifiedAt) }}</div>
+              <div class="meta">{{ t('projects.updated', { date: formatDate(project.modifiedAt) }) }}</div>
             </div>
             <div class="actions">
-              <button class="btn" @click="downloadProject(project)" title="Download project">
+              <button class="btn" @click="downloadProject(project)" :title="t('projects.downloadProjectTitle')">
                 <Download :size="16" />
               </button>
-              <button class="btn" @click="openProject(project.id)">Open</button>
-              <button class="btn" @click="onRename(project)">Rename</button>
-              <button class="btn btn-danger" @click="onDelete(project.id)">Delete</button>
+              <button class="btn" @click="openProject(project.id)">{{ t('projects.open') }}</button>
+              <button class="btn" @click="onRename(project)">{{ t('projects.rename') }}</button>
+              <button class="btn btn-danger" @click="onDelete(project.id)">{{ t('common.delete') }}</button>
             </div>
           </li>
         </ul>
-        <div v-if="!projects.length" class="empty">No projects yet.</div>
+        <div v-if="!projects.length" class="empty">{{ t('projects.empty') }}</div>
 
         <div v-if="showConfirm" class="confirm-overlay" @click.self="showConfirm=false">
           <div class="confirm-modal">
-            <h3>Delete all projects</h3>
-            <p>Type "delete" to confirm. This action cannot be undone.</p>
+            <h3>{{ t('projects.deleteAllTitle') }}</h3>
+            <p>{{ t('projects.deleteAllHint') }}</p>
             <input class="confirm-input" v-model="confirmText" placeholder="delete" />
             <div class="confirm-actions">
-              <button class="btn" @click="showConfirm=false">Cancel</button>
-              <button class="btn btn-danger" :disabled="confirmText !== 'delete'" @click="confirmDeleteAll">Confirm</button>
+              <button class="btn" @click="showConfirm=false">{{ t('common.cancel') }}</button>
+              <button class="btn btn-danger" :disabled="confirmText !== 'delete'" @click="confirmDeleteAll">{{ t('common.confirm') }}</button>
             </div>
           </div>
         </div>
@@ -64,6 +64,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useProjectStore } from '@/stores/project';
 import { useUIStore } from '@/stores/ui';
 import { getAllProjects, loadProject, deleteProject, renameProject, saveProject } from '@/utils/persistence';
@@ -71,6 +72,7 @@ import type { ZineProject } from '@/types';
 import { Download } from 'lucide-vue-next';
 
 const emit = defineEmits<{ (e: 'close'): void }>();
+const { t } = useI18n();
 const uiStore = useUIStore();
 const projectStore = useProjectStore();
 
@@ -107,13 +109,13 @@ async function openProject(id: string) {
 }
 
 async function onDelete(id: string) {
-  if (!confirm('Delete this project? This cannot be undone.')) return;
+  if (!confirm(t('projects.confirmDelete'))) return;
   await deleteProject(id);
   await refresh();
 }
 
 async function onRename(project: ZineProject) {
-  const name = prompt('New name', project.name);
+  const name = prompt(t('projects.newNamePrompt'), project.name);
   if (!name || !name.trim()) return;
   await renameProject(project.id, name.trim());
   await refresh();
@@ -140,10 +142,10 @@ async function importAll(e: Event) {
     const { importAll } = await import('@/utils/portableBackup');
     await importAll(data);
     await refresh();
-    alert('Imported successfully.');
+    alert(t('projects.importSuccess'));
   } catch (err) {
     console.error(err);
-    alert('Import failed.');
+    alert(t('projects.importFailed'));
   } finally {
     if (importInput.value) importInput.value.value = '';
   }
@@ -158,10 +160,10 @@ async function importSingle(e: Event) {
     const { importProject } = await import('@/utils/portableBackup');
     await importProject(data);
     await refresh();
-    alert('Project imported successfully.');
+    alert(t('projects.projectImportSuccess'));
   } catch (err) {
     console.error(err);
-    alert('Import failed.');
+    alert(t('projects.importFailed'));
   } finally {
     if (importOneInput.value) importOneInput.value.value = '';
   }
@@ -220,7 +222,7 @@ onUnmounted(() => { if (onKey) window.removeEventListener('keydown', onKey); });
 }
 .modal-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-soft); }
 .modal-body { padding: 1rem 1.25rem; }
-.close-button { position: absolute; right: 12px; top: 12px; background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--ui-ink); }
+.close-button { position: absolute; inset-inline-end: 12px; top: 12px; background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--ui-ink); }
 .close-button--red { background: var(--accent-red); color: #fff; width: 28px; height: 28px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; border: 1.5px solid var(--border); box-shadow: 2px 2px 0 #000; }
 
 .backup-bar { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }

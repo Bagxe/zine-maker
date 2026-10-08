@@ -1,10 +1,10 @@
 <template>
   <div class="layers-panel">
     <div class="header">
-      <h3>Layers</h3>
+      <h3>{{ t('layers.title') }}</h3>
       <div class="actions">
-        <button class="small" @click="groupSelected" :disabled="projectStore.selectedContentIds.length < 2">Group</button>
-        <button class="small" @click="ungroupSelected" :disabled="projectStore.selectedContentIds.length === 0">Ungroup</button>
+        <button class="small" @click="groupSelected" :disabled="projectStore.selectedContentIds.length < 2">{{ t('layers.group') }}</button>
+        <button class="small" @click="ungroupSelected" :disabled="projectStore.selectedContentIds.length === 0">{{ t('layers.ungroup') }}</button>
       </div>
     </div>
 
@@ -18,24 +18,24 @@
           @drop="onDrop(layer.id)"
           @click="onClickLayer(layer.id, $event)">
         <div class="left">
-          <button class="icon" @click.stop="toggleVisible(layer)" :title="layer.visible === false ? 'Show' : 'Hide'">
+          <button class="icon" @click.stop="toggleVisible(layer)" :title="layer.visible === false ? t('layers.show') : t('layers.hide')"">
             <EyeOff v-if="layer.visible === false" :size="16" />
             <Eye v-else :size="16" />
           </button>
-          <button class="icon" @click.stop="toggleLocked(layer)" :title="layer.locked ? 'Unlock' : 'Lock'">
+          <button class="icon" @click.stop="toggleLocked(layer)" :title="layer.locked ? t('layers.unlock') : t('layers.lock')"">
             <Unlock v-if="layer.locked" :size="16" />
             <Lock v-else :size="16" />
           </button>
         </div>
         <div class="name">{{ layer.name || defaultName(layer) }}</div>
         <div class="right">
-          <button class="icon" @click.stop="moveLayer(layer.id, -1)" :disabled="index === 0" title="Move backward">
+          <button class="icon" @click.stop="moveLayer(layer.id, -1)" :disabled="index === 0" :title="t('layers.moveBackward')">
             <ArrowUp :size="16" />
           </button>
-          <button class="icon" @click.stop="moveLayer(layer.id, 1)" :disabled="index === layers.length - 1" title="Move forward">
+          <button class="icon" @click.stop="moveLayer(layer.id, 1)" :disabled="index === layers.length - 1" :title="t('layers.moveForward')">
             <ArrowDown :size="16" />
           </button>
-          <span class="type">{{ layer.type }}</span>
+          <span class="type">{{ t('layerTypes.' + layer.type) }}</span>
         </div>
       </li>
     </ul>
@@ -44,10 +44,12 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useProjectStore } from '@/stores/project';
 import type { ZineContent } from '@/types';
 import { Eye, EyeOff, Lock, Unlock, ArrowUp, ArrowDown } from 'lucide-vue-next';
 
+const { t } = useI18n();
 const projectStore = useProjectStore();
 
 const layers = computed<ZineContent[]>(() => {

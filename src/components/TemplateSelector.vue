@@ -1,15 +1,15 @@
 <template>
   <div class="template-selector-overlay" @keydown.esc.prevent="uiStore.hideTemplateSelector()" tabindex="-1">
     <div class="template-selector" role="dialog" aria-labelledby="templateSelectorTitle">
-      <button class="close-button close-button--red" @click="uiStore.hideTemplateSelector()" aria-label="Close">×</button>
+      <button class="close-button close-button--red" @click="uiStore.hideTemplateSelector()" :aria-label="t('common.close')">×</button>
       <div class="template-header">
-        <h2 id="templateSelectorTitle">Choose a Zine Template</h2>
-        <p>Select a template and name your project.</p>
+        <h2 id="templateSelectorTitle">{{ t('templateSelector.title') }}</h2>
+        <p>{{ t('templateSelector.subtitle') }}</p>
       </div>
 
       <div class="main-content">
         <div class="recent-projects" v-if="recentProjects.length > 0">
-          <h4>Recent Projects</h4>
+          <h4>{{ t('templateSelector.recentProjects') }}</h4>
           <ul>
             <li v-for="project in recentProjects" :key="project.id" @click="openProject(project)">
               <span class="project-name">{{ project.name }}</span>
@@ -20,22 +20,22 @@
 
         <div class="templates-column">
           <div v-if="showSamplesOnboarding" class="samples-onboarding">
-            <h4>Start from a ready-made sample</h4>
+            <h4>{{ t('templateSelector.samplesTitle') }}</h4>
             <div class="samples-grid">
               <div class="sample-card" v-for="s in sampleCards" :key="s.id">
                 <div class="sample-meta">
                   <div class="name">{{ s.name }}</div>
                   <div class="desc">{{ s.description }}</div>
                 </div>
-                <button class="btn" @click="createFromSample(s.id)">Create from sample</button>
+                <button class="btn" @click="createFromSample(s.id)">{{ t('templateSelector.createFromSample') }}</button>
               </div>
             </div>
           </div>
 
-          <label for="projectName" class="field-label">Project name</label>
+          <label for="projectName" class="field-label">{{ t('templateSelector.projectName') }}</label>
           <div class="name-row">
-            <input id="projectName" class="project-name-input" v-model="projectName" placeholder="e.g. My Zine" />
-            <button class="btn" type="button" @click="projectName = generateName()" title="Generate name">Random</button>
+            <input id="projectName" class="project-name-input" v-model="projectName" :placeholder="t('templateSelector.projectNamePlaceholder')" />
+            <button class="btn" type="button" @click="projectName = generateName()" :title="t('templateSelector.randomTitle')">{{ t('templateSelector.random') }}</button>
           </div>
 
           <div class="template-grid">
@@ -47,18 +47,18 @@
               @click="selectTemplate(template)"
             >
               <div class="template-preview">
-                <div class="template-format">{{ template.format.replace('-', ' ').toUpperCase() }}</div>
-                <div class="template-pages">{{ template.pageCount }} pages</div>
+                <div class="template-format">{{ formatLabel(template.format) }}</div>
+                <div class="template-pages">{{ t('templateSelector.pages', { n: template.pageCount }, template.pageCount) }}</div>
               </div>
               <div class="template-info">
                 <h3>{{ template.name }}</h3>
                 <p>{{ template.description }}</p>
                 <div class="template-details">
                   <span class="detail">{{ template.pageSize.toUpperCase() }}</span>
-                  <span class="detail">{{ template.orientation }}</span>
+                  <span class="detail">{{ orientationLabel(template.orientation) }}</span>
                 </div>
               </div>
-              <button v-if="selectedTemplate?.id === template.id" :disabled="!projectName.trim()" class="create-inline" @click.stop="createProject">Create</button>
+              <button v-if="selectedTemplate?.id === template.id" :disabled="!projectName.trim()" class="create-inline" @click.stop="createProject">{{ t('common.create') }}</button>
             </div>
           </div>
         </div>
@@ -71,12 +71,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useTemplatesStore } from '@/stores/templates';
 import { useProjectStore } from '@/stores/project';
 import { useUIStore } from '@/stores/ui';
 import type { ZineTemplate, ZineProject } from '@/types';
 import { getAllProjects } from '@/utils/persistence';
 
+const { t, te } = useI18n();
 const templatesStore = useTemplatesStore();
 const projectStore = useProjectStore();
 const uiStore = useUIStore();
@@ -112,6 +114,16 @@ onMounted(async () => {
 });
 
 onUnmounted(() => { if (onKey) window.removeEventListener('keydown', onKey); });
+
+function formatLabel(format: string): string {
+  const key = 'templateFormats.' + format;
+  return te(key) ? t(key) : format.replace('-', ' ').toUpperCase();
+}
+
+function orientationLabel(orientation: string): string {
+  const key = 'orientations.' + orientation;
+  return te(key) ? t(key) : orientation;
+}
 
 function selectTemplate(template: ZineTemplate): void {
   selectedTemplate.value = template;
@@ -177,7 +189,7 @@ function formatDate(date: Date): string {
   overflow-y: auto;
   width: 90%;
 }
-.close-button { position: absolute; right: 16px; top: 16px; background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--ui-ink); }
+.close-button { position: absolute; inset-inline-end: 16px; top: 16px; background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--ui-ink); }
 .close-button--red { background: var(--accent-red); color: #fff; width: 28px; height: 28px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; border: 1.5px solid var(--border); box-shadow: 2px 2px 0 #000; }
 
 .template-header {
@@ -203,8 +215,8 @@ function formatDate(date: Date): string {
 .recent-projects {
   width: 250px;
   flex-shrink: 0;
-  border-right: 1px solid var(--border-soft);
-  padding-right: 2rem;
+  border-inline-end: 1px solid var(--border-soft);
+  padding-inline-end: 2rem;
 }
 
 .recent-projects h4 {
@@ -263,7 +275,7 @@ function formatDate(date: Date): string {
 
 .template-card:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 #000; }
 .template-card.selected { outline: 3px solid #00ff7b; }
-.create-inline { position: absolute; right: 10px; bottom: 10px; padding: 6px 10px; background: var(--accent-green); color: #000; border: 1.5px solid var(--border); border-radius: 6px; box-shadow: 2px 2px 0 #000; cursor: pointer; }
+.create-inline { position: absolute; inset-inline-end: 10px; bottom: 10px; padding: 6px 10px; background: var(--accent-green); color: #000; border: 1.5px solid var(--border); border-radius: 6px; box-shadow: 2px 2px 0 #000; cursor: pointer; }
 
 .template-preview {
   display: flex;
@@ -379,9 +391,9 @@ function formatDate(date: Date): string {
   
   .recent-projects {
     width: 100%;
-    border-right: none;
+    border-inline-end: none;
     border-bottom: 1px solid var(--border-soft);
-    padding-right: 0;
+    padding-inline-end: 0;
     padding-bottom: 1.5rem;
   }
   

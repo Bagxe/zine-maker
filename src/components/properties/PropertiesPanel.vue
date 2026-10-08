@@ -2,11 +2,11 @@
   <div class="properties-panel" :class="{ collapsed: uiStore.propertiesCollapsed }">
     <div class="properties-header">
       <div class="tabs">
-        <button :class="['tab', activeTab === 'properties' && 'active']" @click="activeTab = 'properties'">Properties</button>
-        <button :class="['tab', activeTab === 'layers' && 'active']" @click="activeTab = 'layers'">Layers</button>
+        <button :class="['tab', activeTab === 'properties' && 'active']" @click="activeTab = 'properties'">{{ t('properties.title') }}</button>
+        <button :class="['tab', activeTab === 'layers' && 'active']" @click="activeTab = 'layers'">{{ t('properties.layers') }}</button>
       </div>
       <button class="collapse-button" @click="uiStore.togglePropertiesCollapsed()">
-        <ChevronRight v-if="uiStore.propertiesCollapsed" :size="20" />
+        <ChevronRight v-if="uiStore.propertiesCollapsed" :size="20" class="rtl-flip" />
         <ChevronDown v-else :size="20" />
       </button>
     </div>
@@ -17,7 +17,7 @@
       </template>
       <template v-else>
         <div v-if="!hasSelection" class="no-selection">
-          <p>Select an element to edit its properties</p>
+          <p>{{ t('properties.noSelection') }}</p>
         </div>
 
         <div v-else-if="selectedContent.length === 1" class="single-selection">
@@ -63,6 +63,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useProjectStore } from '@/stores/project';
 import { useUIStore } from '@/stores/ui';
 import { ChevronRight, ChevronDown } from 'lucide-vue-next';
@@ -79,6 +80,7 @@ defineEmits<{
   close: [];
 }>();
 
+const { t } = useI18n();
 const projectStore = useProjectStore();
 const uiStore = useUIStore();
 const activeTab = ref<'properties' | 'layers'>('properties');
@@ -114,7 +116,7 @@ function updateTransform(contentId: string, updates: Partial<ZineContent>) {
 .properties-panel {
   width: 280px;
   background: var(--panel);
-  border-left: 1px solid var(--border-soft);
+  border-inline-end: 1px solid var(--border-soft);
   display: flex;
   flex-direction: column;
   height: 100%;

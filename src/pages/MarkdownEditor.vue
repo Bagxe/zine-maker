@@ -707,7 +707,7 @@ onMounted(async () => {
 .zine-preview-panel {
   width: 300px;
   background: var(--panel);
-  border-left: 1px solid var(--border-soft);
+  border-inline-start: 1px solid var(--border-soft);
   display: flex;
   flex-direction: column;
 }
@@ -868,7 +868,7 @@ onMounted(async () => {
   
   .zine-preview-panel {
     width: 100%;
-    border-left: none;
+    border-inline-start: none;
     border-top: 1px solid var(--border-soft);
   }
   

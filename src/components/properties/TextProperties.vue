@@ -1,9 +1,9 @@
 <template>
   <div class="text-properties">
     <div class="property-section">
-      <h4>Text</h4>
+      <h4>{{ t('props.text') }}</h4>
       <div class="property-group">
-        <label>Content</label>
+        <label>{{ t('props.content') }}</label>
         <textarea 
           :value="textProps.text"
           @input="updateText(($event.target as HTMLTextAreaElement).value)"
@@ -14,9 +14,9 @@
     </div>
 
     <div class="property-section">
-      <h4>Typography</h4>
+      <h4>{{ t('props.typography') }}</h4>
       <div class="property-group">
-        <label>Font Family</label>
+        <label>{{ t('props.fontFamily') }}</label>
         <select 
           :value="textProps.fontFamily"
           @change="updateProperty('fontFamily', ($event.target as HTMLSelectElement).value)"
@@ -34,7 +34,7 @@
 
       <div class="property-row">
         <div class="property-group">
-          <label>Size</label>
+          <label>{{ t('props.size') }}</label>
           <NumberInput 
             :value="textProps.fontSize"
             @update="updateProperty('fontSize', $event)"
@@ -44,7 +44,7 @@
           />
         </div>
         <div class="property-group">
-          <label>Line Height</label>
+          <label>{{ t('props.lineHeight') }}</label>
           <NumberInput 
             :value="textProps.lineHeight"
             @update="updateProperty('lineHeight', $event)"
@@ -56,7 +56,7 @@
       </div>
 
       <div class="property-group">
-        <label>Style</label>
+        <label>{{ t('props.style') }}</label>
         <div class="button-group">
           <button 
             @click="toggleWeight"
@@ -83,7 +83,7 @@
       </div>
 
       <div class="property-group">
-        <label>Alignment</label>
+        <label>{{ t('props.alignment') }}</label>
         <div class="button-group">
           <button 
             @click="updateProperty('textAlign', 'left')"
@@ -111,9 +111,9 @@
     </div>
 
     <div class="property-section">
-      <h4>Appearance</h4>
+      <h4>{{ t('props.appearance') }}</h4>
       <div class="property-group">
-        <label>Text Color</label>
+        <label>{{ t('props.textColor') }}</label>
         <ColorPicker 
           :value="textProps.color"
           @update="updateProperty('color', $event)"
@@ -121,7 +121,7 @@
       </div>
 
       <div class="property-group" v-if="textProps.backgroundColor">
-        <label>Background Color</label>
+        <label>{{ t('props.backgroundColor') }}</label>
         <ColorPicker 
           :value="textProps.backgroundColor || '#ffffff'"
           @update="updateProperty('backgroundColor', $event)"
@@ -129,7 +129,7 @@
       </div>
 
       <div class="property-group">
-        <label>Padding</label>
+        <label>{{ t('props.padding') }}</label>
         <NumberInput 
           :value="textProps.padding"
           @update="updateProperty('padding', $event)"
@@ -144,6 +144,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { ZineContent, TextProperties } from '@/types';
 import ColorPicker from './ColorPicker.vue';
 import NumberInput from './NumberInput.vue';
@@ -156,6 +157,7 @@ interface Emits {
   update: [contentId: string, updates: Partial<ZineContent>];
 }
 
+const { t } = useI18n();
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 

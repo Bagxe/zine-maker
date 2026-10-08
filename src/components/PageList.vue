@@ -1,10 +1,10 @@
 <template>
   <div class="page-list" :class="{ collapsed: uiStore.pageListCollapsed }">
     <div class="page-list-header">
-      <h3>Pages</h3>
-      <span class="page-count">{{ projectStore.pageCount }} pages</span>
+      <h3>{{ t('pages.title') }}</h3>
+      <span class="page-count">{{ t('pages.count', { n: projectStore.pageCount }, projectStore.pageCount) }}</span>
       <button class="collapse-button" @click="uiStore.togglePageListCollapsed()">
-        <ChevronRight v-if="uiStore.pageListCollapsed" :size="20" />
+        <ChevronRight v-if="uiStore.pageListCollapsed" :size="20" class="rtl-flip" />
         <ChevronDown v-else :size="20" />
       </button>
     </div>
@@ -28,24 +28,25 @@
         <div class="page-info">
           <div class="page-title" @dblclick.stop="startEdit(page)" v-if="editingId !== page.id">{{ pageTitle(page) }}</div>
           <input v-else class="title-input" :value="editValue" @input="onEditInput($event)" @keydown.enter.prevent="commitEdit(page)" @keydown.esc.prevent="cancelEdit" @blur="commitEdit(page)" />
-          <div class="page-stats">{{ page.content.length }} items</div>
+          <div class="page-stats">{{ t('pages.items', { n: page.content.length }, page.content.length) }}</div>
         </div>
       </div>
     </div>
 
     <div class="page-actions">
       <div class="export-options">
-        <label><input type="checkbox" v-model="uiStore.showPageNumbers" /> Page numbers</label>
-        <label><input type="checkbox" v-model="uiStore.showFoldMarks" /> Fold marks</label>
-        <label><input type="checkbox" v-model="uiStore.showCutMarks" /> Cut marks</label>
+        <label><input type="checkbox" v-model="uiStore.showPageNumbers" /> {{ t('pages.pageNumbers') }}</label>
+        <label><input type="checkbox" v-model="uiStore.showFoldMarks" /> {{ t('pages.foldMarks') }}</label>
+        <label><input type="checkbox" v-model="uiStore.showCutMarks" /> {{ t('pages.cutMarks') }}</label>
       </div>
-      <button @click="exportZine" class="export-button export-button--green">Export Zine for Printing</button>
+      <button @click="exportZine" class="export-button export-button--green">{{ t('pages.exportButton') }}</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useSortable } from '@vueuse/integrations/useSortable';
 import { useProjectStore } from '@/stores/project';
 import { useUIStore } from '@/stores/ui';
@@ -53,6 +54,7 @@ import { useAssetStore } from '@/stores/assetStore';
 import { exportZineForTemplate, exportZineDigital } from '@/composables/useZineExport';
 import { ChevronRight, ChevronDown } from 'lucide-vue-next';
 
+const { t } = useI18n();
 const projectStore = useProjectStore();
 const uiStore = useUIStore();
 const assetStore = useAssetStore();
@@ -81,8 +83,8 @@ useSortable(pagesGridRef, pageIds, {
 function pageTitle(page: any): string {
   const tpl = projectStore.currentProject?.template;
   if (!tpl) return page.title;
-  if (page.pageNumber === 1) return 'Front Cover';
-  if (page.pageNumber === tpl.pageCount) return 'Back Cover';
+  if (page.pageNumber === 1) return t('pages.frontCover');
+  if (page.pageNumber === tpl.pageCount) return t('pages.backCover');
   return page.title;
 }
 
@@ -137,7 +139,7 @@ async function exportZine(): Promise<void> {
 
   } catch (error) {
     console.error('Export failed:', error);
-    alert('Export failed. Please check the console for details.');
+    alert(t('pages.exportFailed'));
   }
 }
 
@@ -151,7 +153,7 @@ async function exportZine(): Promise<void> {
   height: 100%;
   padding: 0.75rem;
   background: var(--panel);
-  border-right: 1px solid var(--border-soft);
+  border-inline-end: 1px solid var(--border-soft);
 }
 .page-list.collapsed { width: 40px; }
 .page-list.collapsed .pages-grid, .page-list.collapsed .page-actions, .page-list.collapsed .page-count { display: none; }
@@ -201,8 +203,8 @@ async function exportZine(): Promise<void> {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-right: -0.5rem;
-  padding-right: 0.5rem;
+  margin-inline-end: -0.5rem;
+  padding-inline-end: 0.5rem;
 }
 
 .page-item {

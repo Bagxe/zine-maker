@@ -20,10 +20,10 @@
     <TemplateSelector v-if="uiStore.showTemplateSelector" />
     <div v-if="uiStore.showStorageNotice" class="notice-overlay" @click.self="uiStore.closeStorageNotice()">
       <div class="notice">
-        <h3>About Your Projects</h3>
-        <p>Your projects are saved in your browser (IndexedDB/localStorage). They are not stored in the cloud.</p>
-        <p>A browser reset or clearing site data will remove local projects. Consider exporting regularly.</p>
-        <button class="header-button header-button--red" @click="uiStore.closeStorageNotice()">Got it</button>
+        <h3>{{ t('storageNotice.title') }}</h3>
+        <p>{{ t('storageNotice.body1') }}</p>
+        <p>{{ t('storageNotice.body2') }}</p>
+        <button class="header-button header-button--red" @click="uiStore.closeStorageNotice()">{{ t('storageNotice.gotIt') }}</button>
       </div>
     </div>
     
@@ -41,29 +41,30 @@
         </div>
         
         <div class="header-right">
-          <button v-if="isMobile" @click="uiStore.togglePageListCollapsed()" class="header-button icon-only" title="Toggle Pages" aria-label="Toggle Pages">
+          <LanguageSwitcher />
+          <button v-if="isMobile" @click="uiStore.togglePageListCollapsed()" class="header-button icon-only" :title="t('header.togglePages')" :aria-label="t('header.togglePages')">
             <Sidebar :size="16" />
           </button>
-          <button v-if="isMobile" @click="uiStore.togglePropertiesCollapsed()" class="header-button icon-only" title="Toggle Properties" aria-label="Toggle Properties">
+          <button v-if="isMobile" @click="uiStore.togglePropertiesCollapsed()" class="header-button icon-only" :title="t('header.toggleProperties')" :aria-label="t('header.toggleProperties')">
             <Sliders :size="16" />
           </button>
-          <a v-if="!isMobile" href="https://github.com/virgilvox/zine-maker" target="_blank" rel="noopener noreferrer" class="header-button icon-only" title="GitHub Repository" aria-label="GitHub">
+          <a v-if="!isMobile" href="https://github.com/virgilvox/zine-maker" target="_blank" rel="noopener noreferrer" class="header-button icon-only" :title="t('header.github')" aria-label="GitHub">
             <Github :size="16" />
           </a>
-          <router-link to="/markdown" class="header-button" title="Markdown Editor" aria-label="Markdown">
+          <router-link to="/markdown" class="header-button" :title="t('header.markdownTitle')" :aria-label="t('header.markdown')">
             <FileText :size="16" />
-            <span>Markdown</span>
+            <span>{{ t('header.markdown') }}</span>
           </router-link>
-          <button @click="uiStore.showTemplateSelectorModal()" class="header-button header-button--red" title="New Project">
+          <button @click="uiStore.showTemplateSelectorModal()" class="header-button header-button--red" :title="t('header.newProject')">
             <FilePlus :size="16" />
-            <span>New Project</span>
+            <span>{{ t('header.newProject') }}</span>
           </button>
-          <button @click="manualSave" class="header-button icon-only" :disabled="saving" title="Save project" aria-label="Save">
+          <button @click="manualSave" class="header-button icon-only" :disabled="saving" :title="t('header.saveTitle')" :aria-label="t('common.save')">
             <Save :size="16" />
           </button>
-          <button @click="uiStore.openProjectsModal()" class="header-button" title="Projects">
+          <button @click="uiStore.openProjectsModal()" class="header-button" :title="t('header.projects')">
             <FolderOpen :size="16" />
-            <span>Projects</span>
+            <span>{{ t('header.projects') }}</span>
           </button>
         </div>
       </header>
@@ -89,6 +90,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import TemplateSelector from '@/components/TemplateSelector.vue';
 import AppLogo from '@/components/AppLogo.vue';
 import KonvaPageEditor from '@/components/KonvaPageEditor.vue';
@@ -97,6 +99,7 @@ import PageList from '@/components/PageList.vue';
 import ImageUploadModal from '@/components/ImageUploadModal.vue';
 import ExportModal from '@/components/ExportModal.vue';
 import RssAudioPlayer from '@/components/RssAudioPlayer.vue';
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import { useProjectStore } from '@/stores/project';
 import { useUIStore } from '@/stores/ui';
 import { useToolsStore } from '@/stores/tools';
@@ -110,6 +113,7 @@ const projectStore = useProjectStore();
 const uiStore = useUIStore();
 const toolsStore = useToolsStore();
 const assetStore = useAssetStore();
+const { t } = useI18n();
 
 const theme = ref<'light'|'dark'>( (localStorage.getItem('theme') as any) || 'light');
 const isMobile = ref(false);
@@ -583,11 +587,11 @@ body {
     will-change: transform;
   }
   .sidebar { 
-    left: 0; 
+    inset-inline-start: 0; 
     width: min(80vw, 320px); 
   }
   .properties { 
-    right: 0; 
+    inset-inline-end: 0; 
     width: min(80vw, 360px); 
   }
   

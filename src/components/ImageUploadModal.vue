@@ -4,8 +4,8 @@
       <button class="close-button" @click="$emit('close')">×</button>
       
       <div class="modal-header">
-        <h3>Add Image</h3>
-        <p>Drag & drop an image file or click to select</p>
+        <h3>{{ t('imageUpload.title') }}</h3>
+        <p>{{ t('imageUpload.subtitle') }}</p>
       </div>
 
       <div 
@@ -16,8 +16,8 @@
         <input type="file" ref="fileInput" @change="handleFileSelect" accept="image/*" class="hidden-input" />
         <div class="dropzone-content">
           <ImageIcon :size="48" stroke-width="1.5" />
-          <p v-if="isDragging">Drop image here</p>
-          <p v-else>Click to upload or drag a file</p>
+          <p v-if="isDragging">{{ t('imageUpload.dropHere') }}</p>
+          <p v-else>{{ t('imageUpload.clickOrDrag') }}</p>
         </div>
       </div>
     </div>
@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useAssetStore } from '@/stores/assetStore';
 import { ImageIcon } from 'lucide-vue-next';
 
@@ -38,6 +39,7 @@ const emit = defineEmits<{
   (e: 'image-added', id: number): void
 }>();
 
+const { t } = useI18n();
 const assetStore = useAssetStore();
 const isDragging = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -96,7 +98,7 @@ function handleDrop(event: DragEvent) {
 .close-button {
   position: absolute;
   top: 1rem;
-  right: 1rem;
+  inset-inline-end: 1rem;
   background: none;
   border: none;
   font-size: 1.5rem;

@@ -1,7 +1,7 @@
 <template>
   <div class="multi-selection-properties">
     <div class="property-section">
-      <h4>Multi-Selection ({{ content.length }} items)</h4>
+      <h4>{{ t('props.multiSelection', { n: content.length }) }}</h4>
       
       <div class="selection-summary">
         <div class="content-types">
@@ -13,11 +13,11 @@
     </div>
 
     <div class="property-section" v-if="hasCommonProperties">
-      <h4>Common Properties</h4>
+      <h4>{{ t('props.commonProperties') }}</h4>
       
       <!-- Show color picker if all selected items support color -->
       <div class="property-group" v-if="supportsColor">
-        <label>Color</label>
+        <label>{{ t('props.color') }}</label>
         <ColorPicker 
           :value="commonColor || '#000000'"
           @update="updateCommonColor"
@@ -26,7 +26,7 @@
 
       <!-- Show opacity if all selected items support it -->
       <div class="property-group" v-if="supportsOpacity">
-        <label>Opacity</label>
+        <label>{{ t('props.opacity') }}</label>
         <div class="opacity-control">
           <input 
             type="range"
@@ -42,19 +42,19 @@
     </div>
 
     <div class="property-section">
-      <h4>Bulk Actions</h4>
+      <h4>{{ t('props.bulkActions') }}</h4>
       <div class="property-group">
         <button @click="groupItems" class="action-button">
-          Group Items
+          {{ t('props.groupItems') }}
         </button>
         <button @click="distributeHorizontally" class="action-button">
-          Distribute Horizontally
+          {{ t('props.distributeHorizontally') }}
         </button>
         <button @click="distributeVertically" class="action-button">
-          Distribute Vertically
+          {{ t('props.distributeVertically') }}
         </button>
         <button @click="matchSize" class="action-button">
-          Match Size to First
+          {{ t('props.matchSize') }}
         </button>
       </div>
     </div>
@@ -63,6 +63,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useProjectStore } from '@/stores/project';
 import type { ZineContent, TextProperties, ShapeProperties, ImageProperties, DrawingProperties } from '@/types';
 import ColorPicker from './ColorPicker.vue';
@@ -75,6 +76,7 @@ interface Emits {
   update: [updates: Partial<ZineContent>];
 }
 
+const { t } = useI18n();
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 const projectStore = useProjectStore();

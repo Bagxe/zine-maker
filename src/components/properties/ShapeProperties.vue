@@ -1,23 +1,23 @@
 <template>
   <div class="shape-properties">
     <div class="property-section">
-      <h4>Shape</h4>
+      <h4>{{ t('props.shape') }}</h4>
       <div class="property-group">
-        <label>Type</label>
+        <label>{{ t('props.type') }}</label>
         <select 
           :value="shapeProps.shapeType"
           @change="updateProperty('shapeType', ($event.target as HTMLSelectElement).value)"
           class="select-input"
         >
-          <option value="rectangle">Rectangle</option>
-          <option value="circle">Circle</option>
-          <option value="line">Line</option>
-          <option value="triangle">Triangle</option>
+          <option value="rectangle">{{ t('shapes.rectangle') }}</option>
+          <option value="circle">{{ t('shapes.circle') }}</option>
+          <option value="line">{{ t('shapes.line') }}</option>
+          <option value="triangle">{{ t('shapes.triangle') }}</option>
         </select>
       </div>
 
       <div class="property-group" v-if="shapeProps.shapeType === 'rectangle'">
-        <label>Corner Radius</label>
+        <label>{{ t('props.cornerRadius') }}</label>
         <NumberInput 
           :value="shapeProps.cornerRadius || 0"
           @update="updateProperty('cornerRadius', $event)"
@@ -29,9 +29,9 @@
     </div>
 
     <div class="property-section">
-      <h4>Fill</h4>
+      <h4>{{ t('props.fill') }}</h4>
       <div class="property-group">
-        <label>Fill Color</label>
+        <label>{{ t('props.fillColor') }}</label>
         <ColorPicker 
           :value="shapeProps.fill"
           @update="updateProperty('fill', $event)"
@@ -40,9 +40,9 @@
     </div>
 
     <div class="property-section">
-      <h4>Stroke</h4>
+      <h4>{{ t('props.stroke') }}</h4>
       <div class="property-group">
-        <label>Stroke Color</label>
+        <label>{{ t('props.strokeColor') }}</label>
         <ColorPicker 
           :value="shapeProps.stroke"
           @update="updateProperty('stroke', $event)"
@@ -50,7 +50,7 @@
       </div>
 
       <div class="property-group">
-        <label>Stroke Width</label>
+        <label>{{ t('props.strokeWidth') }}</label>
         <NumberInput 
           :value="shapeProps.strokeWidth"
           @update="updateProperty('strokeWidth', $event)"
@@ -62,9 +62,9 @@
     </div>
 
     <div class="property-section">
-      <h4>Appearance</h4>
+      <h4>{{ t('props.appearance') }}</h4>
       <div class="property-group">
-        <label>Opacity</label>
+        <label>{{ t('props.opacity') }}</label>
         <div class="opacity-control">
           <input 
             type="range"
@@ -83,6 +83,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { ZineContent, ShapeProperties } from '@/types';
 import ColorPicker from './ColorPicker.vue';
 import NumberInput from './NumberInput.vue';
@@ -95,6 +96,7 @@ interface Emits {
   update: [contentId: string, updates: Partial<ZineContent>];
 }
 
+const { t } = useI18n();
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 

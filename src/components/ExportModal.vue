@@ -4,8 +4,8 @@
       <button class="close-button" @click="$emit('close')">×</button>
       
       <div class="modal-header">
-        <h3>Export Zine</h3>
-        <p>Preview and download your zine layout for printing.</p>
+        <h3>{{ t('exportModal.title') }}</h3>
+        <p>{{ t('exportModal.subtitle') }}</p>
       </div>
 
       <div class="export-tabs">
@@ -14,21 +14,21 @@
           :class="{ active: activeTab === 'png' }"
           class="tab-button"
         >
-          PNG Preview
+          {{ t('exportModal.tabPng') }}
         </button>
         <button 
           @click="activeTab = 'pdf'" 
           :class="{ active: activeTab === 'pdf' }"
           class="tab-button"
         >
-          Print PDF
+          {{ t('exportModal.tabPdf') }}
         </button>
         <button 
           @click="activeTab = 'digital'" 
           :class="{ active: activeTab === 'digital' }"
           class="tab-button"
         >
-          Digital PDF
+          {{ t('exportModal.tabDigital') }}
         </button>
       </div>
 
@@ -38,8 +38,8 @@
           <img :src="currentPng" alt="Zine Preview" class="png-image" />
         </div>
         <div v-else-if="activeTab === 'png'" class="no-preview">
-          <p>PNG preview not available</p>
-          <p class="debug">No images generated</p>
+          <p>{{ t('exportModal.noPng') }}</p>
+          <p class="debug">{{ t('exportModal.noImages') }}</p>
         </div>
         <iframe 
           v-else-if="(activeTab === 'pdf' || activeTab === 'digital') && currentPdfSrc" 
@@ -47,60 +47,60 @@
           class="pdf-preview"
         ></iframe>
         <div v-else class="no-preview">
-          <p>PDF preview not available</p>
-          <p class="debug">PDF data length: {{ currentPdfSrc ? currentPdfSrc.length : 0 }}</p>
+          <p>{{ t('exportModal.noPdf') }}</p>
+          <p class="debug">{{ t('exportModal.pdfDataLength', { n: currentPdfSrc ? currentPdfSrc.length : 0 }) }}</p>
         </div>
       </div>
 
       <div class="pager-row" v-if="activeTab==='png' && uiStore.exportImages.length > 1">
-        <button class="pager-btn" @click="prevPage" :disabled="pageIndex===0">← Prev</button>
+        <button class="pager-btn" @click="prevPage" :disabled="pageIndex===0">{{ t('exportModal.prev') }}</button>
         <span class="pager-indicator">{{ pageIndex + 1 }} / {{ uiStore.exportImages.length }}</span>
-        <button class="pager-btn" @click="nextPage" :disabled="pageIndex===uiStore.exportImages.length-1">Next →</button>
+        <button class="pager-btn" @click="nextPage" :disabled="pageIndex===uiStore.exportImages.length-1">{{ t('exportModal.next') }}</button>
       </div>
 
       <div class="export-actions">
         <button @click="downloadPng" class="download-button png-button">
           <Download :size="16" />
-          <span>Download PNG</span>
+          <span>{{ t('exportModal.downloadPng') }}</span>
         </button>
         <button @click="downloadPdf" class="download-button pdf-button">
           <FileText :size="16" />
-          <span>Print PDF</span>
+          <span>{{ t('exportModal.printPdf') }}</span>
         </button>
         <button @click="downloadDigitalPdf" class="download-button digital-button" :disabled="!uiStore.exportDigitalPdfData">
           <Smartphone :size="16" />
-          <span>Digital PDF</span>
+          <span>{{ t('exportModal.digitalPdf') }}</span>
         </button>
         <button
           @click="sendToZineStudio"
           class="download-button studio-button"
           :disabled="!canHandoff || handoffStatus === 'sending'"
-          :title="canHandoff ? 'Send pages to Zine Studio' : 'No pages to send'"
+          :title="canHandoff ? t('exportModal.sendPagesTitle') : t('exportModal.noPagesTitle')"
         >
           <Send :size="16" />
-          <span>{{ handoffStatus === 'sending' ? 'Sending…' : 'Send to Zine Studio' }}</span>
+          <span>{{ handoffStatus === 'sending' ? t('exportModal.sending') : t('exportModal.sendToStudio') }}</span>
         </button>
       </div>
 
       <div v-if="handoffStatus === 'done'" class="handoff-status handoff-status--success">
-        <span>Sent {{ handoffPageCount }} page{{ handoffPageCount === 1 ? '' : 's' }} to Zine Studio.</span>
-        <a :href="zineStudioFromEditorUrl" class="handoff-link">Open Zine Studio →</a>
+        <span>{{ t('exportModal.sentPages', { n: handoffPageCount }, handoffPageCount) }}</span>
+        <a :href="zineStudioFromEditorUrl" class="handoff-link">{{ t('exportModal.openStudio') }}</a>
       </div>
       <div v-else-if="handoffStatus === 'error'" class="handoff-status handoff-status--error">
-        <span>Couldn't send to Zine Studio{{ handoffError ? `: ${handoffError}` : '.' }} Try downloading the PNGs instead.</span>
+        <span>{{ t('exportModal.sendFailed', { suffix: handoffError ? `: ${handoffError}` : '.' }) }}</span>
       </div>
 
       <p class="studio-crosslink">
-        Need professional imposition or a scroll PDF?
-        <a :href="zineStudioUrl" target="_blank" rel="noopener noreferrer" class="handoff-link">Impose &amp; print with Zine Studio →</a>
+        {{ t('exportModal.studioCrosslink') }}
+        <a :href="zineStudioUrl" target="_blank" rel="noopener noreferrer" class="handoff-link">{{ t('exportModal.studioCrosslinkLink') }}</a>
       </p>
 
       <div class="print-instructions">
-        <h4>Printing Instructions:</h4>
+        <h4>{{ t('exportModal.printInstructions') }}</h4>
         <ul>
-          <li>Print at 100% scale (no scaling). Use standard size paper (letter: 8.5" × 11", A4: 210mm × 297mm)</li>
-          <li>For quarter-fold: Fold in half horizontally, then vertically. For half-fold: Fold in half along the center line.</li>
-          <li>Cut along fold lines if needed to separate pages</li>
+          <li>{{ t('exportModal.instr1') }}</li>
+          <li>{{ t('exportModal.instr2') }}</li>
+          <li>{{ t('exportModal.instr3') }}</li>
         </ul>
       </div>
     </div>
@@ -109,6 +109,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { Download, FileText, Smartphone, Send } from 'lucide-vue-next';
 import { useUIStore } from '@/stores/ui';
 import { useAssetStore } from '@/stores/assetStore';
@@ -121,6 +122,7 @@ defineEmits<{
   (e: 'close'): void;
 }>();
 
+const { t } = useI18n();
 const uiStore = useUIStore();
 const assetStore = useAssetStore();
 const activeTab = ref<'png' | 'pdf' | 'digital'>('png');
@@ -162,8 +164,8 @@ function nextPage() { if (pageIndex.value < uiStore.exportImages.length - 1) pag
 function prevPage() { if (pageIndex.value > 0) pageIndex.value--; }
 
 const sideLabel = computed(() => {
-  if (uiStore.exportImages.length === 2) return pageIndex.value === 0 ? 'Front (Side 1)' : 'Back (Side 2)';
-  return 'Sheet';
+  if (uiStore.exportImages.length === 2) return pageIndex.value === 0 ? t('exportModal.sideFront') : t('exportModal.sideBack');
+  return t('exportModal.sheet');
 });
 
 // Convert a PDF data URL to a blob URL for better iframe compatibility
@@ -238,7 +240,7 @@ function downloadDigitalPdf() {
 }
 .close-button {
   position: absolute;
-  top: 1rem; right: 1rem;
+  top: 1rem; inset-inline-end: 1rem;
   background: none; border: none;
   font-size: 1.5rem;
   cursor: pointer;
@@ -310,7 +312,7 @@ function downloadDigitalPdf() {
 .page-label {
   position: absolute;
   top: 8px;
-  left: 8px;
+  inset-inline-start: 8px;
   background: rgba(0,0,0,.65);
   color: #fff;
   padding: 4px 8px;
@@ -471,7 +473,7 @@ function downloadDigitalPdf() {
 
 .print-instructions ul {
   margin: 0;
-  padding-left: 1.2rem;
+  padding-inline-start: 1.2rem;
   font-size: 0.7rem;
   color: #6b7280;
   line-height: 1.4;

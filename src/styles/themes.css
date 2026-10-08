@@ -61,3 +61,6 @@ body::before{
 .btn--ghost{ background:transparent; }
 
 
+
+/* RTL: mirror directional icons (e.g. panel collapse chevrons) */
+[dir="rtl"] .rtl-flip{ transform:scaleX(-1); }

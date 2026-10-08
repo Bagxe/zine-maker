@@ -143,9 +143,9 @@
         </v-stage>
       </div>
       <div class="floating-zoom">
-        <button class="fz-btn" @click="zoomOut" title="Zoom Out">–</button>
-        <button class="fz-btn" @click="fit" title="Fit">Fit</button>
-        <button class="fz-btn" @click="zoomIn" title="Zoom In">+</button>
+        <button class="fz-btn" @click="zoomOut" :title="t('canvas.zoomOut')">–</button>
+        <button class="fz-btn" @click="fit" :title="t('canvas.fit')">{{ t('canvas.fit') }}</button>
+        <button class="fz-btn" @click="zoomIn" :title="t('canvas.zoomIn')">+</button>
       </div>
       
 
@@ -168,6 +168,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick, shallowRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useProjectStore } from '@/stores/project';
 import { useToolsStore } from '@/stores/tools';
 import { useAssetStore } from '@/stores/assetStore';
@@ -176,6 +177,7 @@ import Konva from 'konva';
 import AppToolbar from './AppToolbar.vue';
 import { useUIStore } from '@/stores/ui';
 
+const { t } = useI18n();
 const projectStore = useProjectStore();
 const toolsStore = useToolsStore();
 const assetStore = useAssetStore();

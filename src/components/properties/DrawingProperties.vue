@@ -1,20 +1,20 @@
 <template>
   <div class="drawing-properties">
     <div class="property-section">
-      <h4>Drawing</h4>
+      <h4>{{ t('props.drawing') }}</h4>
       <div class="property-group">
-        <label>Paths</label>
+        <label>{{ t('props.paths') }}</label>
         <div class="paths-info">
-          <span class="path-count">{{ drawingProps.paths.length }} path(s)</span>
-          <button @click="clearPaths" class="clear-button">Clear All</button>
+          <span class="path-count">{{ t('props.pathCount', { n: drawingProps.paths.length }, drawingProps.paths.length) }}</span>
+          <button @click="clearPaths" class="clear-button">{{ t('props.clearAll') }}</button>
         </div>
       </div>
     </div>
 
     <div class="property-section">
-      <h4>Stroke</h4>
+      <h4>{{ t('props.stroke') }}</h4>
       <div class="property-group">
-        <label>Stroke Color</label>
+        <label>{{ t('props.strokeColor') }}</label>
         <ColorPicker 
           :value="drawingProps.strokeColor"
           @update="updateProperty('strokeColor', $event)"
@@ -22,7 +22,7 @@
       </div>
 
       <div class="property-group">
-        <label>Stroke Width</label>
+        <label>{{ t('props.strokeWidth') }}</label>
         <NumberInput 
           :value="drawingProps.strokeWidth"
           @update="updateProperty('strokeWidth', $event)"
@@ -33,36 +33,36 @@
       </div>
 
       <div class="property-group">
-        <label>Line Cap</label>
+        <label>{{ t('props.lineCap') }}</label>
         <select 
           :value="drawingProps.lineCap || 'round'"
           @change="updateProperty('lineCap', ($event.target as HTMLSelectElement).value)"
           class="select-input"
         >
-          <option value="butt">Butt</option>
-          <option value="round">Round</option>
-          <option value="square">Square</option>
+          <option value="butt">{{ t('props.capButt') }}</option>
+          <option value="round">{{ t('props.capRound') }}</option>
+          <option value="square">{{ t('props.capSquare') }}</option>
         </select>
       </div>
 
       <div class="property-group">
-        <label>Line Join</label>
+        <label>{{ t('props.lineJoin') }}</label>
         <select 
           :value="drawingProps.lineJoin || 'round'"
           @change="updateProperty('lineJoin', ($event.target as HTMLSelectElement).value)"
           class="select-input"
         >
-          <option value="miter">Miter</option>
-          <option value="round">Round</option>
-          <option value="bevel">Bevel</option>
+          <option value="miter">{{ t('props.joinMiter') }}</option>
+          <option value="round">{{ t('props.joinRound') }}</option>
+          <option value="bevel">{{ t('props.joinBevel') }}</option>
         </select>
       </div>
     </div>
 
     <div class="property-section">
-      <h4>Appearance</h4>
+      <h4>{{ t('props.appearance') }}</h4>
       <div class="property-group">
-        <label>Opacity</label>
+        <label>{{ t('props.opacity') }}</label>
         <div class="opacity-control">
           <input 
             type="range"
@@ -83,19 +83,19 @@
             :checked="drawingProps.smoothing !== false"
             @change="updateProperty('smoothing', ($event.target as HTMLInputElement).checked)"
           />
-          Smooth Lines
+          {{ t('props.smoothLines') }}
         </label>
       </div>
     </div>
 
     <div class="property-section">
-      <h4>Actions</h4>
+      <h4>{{ t('props.actions') }}</h4>
       <div class="property-group">
         <button @click="duplicateDrawing" class="action-button">
-          Duplicate Drawing
+          {{ t('props.duplicateDrawing') }}
         </button>
         <button @click="convertToShape" class="action-button">
-          Convert to Shape
+          {{ t('props.convertToShape') }}
         </button>
       </div>
     </div>
@@ -104,6 +104,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { ZineContent, DrawingProperties } from '@/types';
 import { useProjectStore } from '@/stores/project';
 import ColorPicker from './ColorPicker.vue';
@@ -117,6 +118,7 @@ interface Emits {
   update: [contentId: string, updates: Partial<ZineContent>];
 }
 
+const { t } = useI18n();
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 

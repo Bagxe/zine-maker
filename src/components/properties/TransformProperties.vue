@@ -1,7 +1,7 @@
 <template>
   <div class="transform-properties">
     <div class="property-section">
-      <h4>Transform</h4>
+      <h4>{{ t('props.transform') }}</h4>
       
       <div class="property-row">
         <div class="property-group">
@@ -24,7 +24,7 @@
 
       <div class="property-row">
         <div class="property-group">
-          <label>Width</label>
+          <label>{{ t('props.width') }}</label>
           <NumberInput 
             :value="transformData.width"
             @update="updateTransform('width', $event)"
@@ -33,7 +33,7 @@
           />
         </div>
         <div class="property-group">
-          <label>Height</label>
+          <label>{{ t('props.height') }}</label>
           <NumberInput 
             :value="transformData.height"
             @update="updateTransform('height', $event)"
@@ -44,7 +44,7 @@
       </div>
 
       <div class="property-group">
-        <label>Rotation</label>
+        <label>{{ t('props.rotation') }}</label>
         <div class="rotation-control">
           <input 
             type="range"
@@ -66,7 +66,7 @@
       </div>
 
       <div class="property-group" v-if="content.length === 1">
-        <label>Z-Index</label>
+        <label>{{ t('props.zIndex') }}</label>
         <div class="z-index-control">
           <NumberInput 
             :value="content[0].zIndex"
@@ -75,40 +75,40 @@
             class="z-index-input"
           />
           <div class="z-index-buttons">
-            <button @click="bringToFront" class="z-button">Front</button>
-            <button @click="sendToBack" class="z-button">Back</button>
+            <button @click="bringToFront" class="z-button">{{ t('props.front') }}</button>
+            <button @click="sendToBack" class="z-button">{{ t('props.back') }}</button>
           </div>
         </div>
       </div>
     </div>
 
     <div class="property-section" v-if="content.length > 1">
-      <h4>Multi-Selection</h4>
+      <h4>{{ t('props.multiSelectionTitle') }}</h4>
       <div class="property-group">
         <div class="multi-actions">
-          <button @click="alignLeft" class="align-button">Align Left</button>
-          <button @click="alignCenter" class="align-button">Align Center</button>
-          <button @click="alignRight" class="align-button">Align Right</button>
+          <button @click="alignLeft" class="align-button">{{ t('props.alignLeft') }}</button>
+          <button @click="alignCenter" class="align-button">{{ t('props.alignCenter') }}</button>
+          <button @click="alignRight" class="align-button">{{ t('props.alignRight') }}</button>
         </div>
         <div class="multi-actions">
-          <button @click="alignTop" class="align-button">Align Top</button>
-          <button @click="alignMiddle" class="align-button">Align Middle</button>
-          <button @click="alignBottom" class="align-button">Align Bottom</button>
+          <button @click="alignTop" class="align-button">{{ t('props.alignTop') }}</button>
+          <button @click="alignMiddle" class="align-button">{{ t('props.alignMiddle') }}</button>
+          <button @click="alignBottom" class="align-button">{{ t('props.alignBottom') }}</button>
         </div>
       </div>
     </div>
 
     <div class="property-section">
-      <h4>Actions</h4>
+      <h4>{{ t('props.actions') }}</h4>
       <div class="property-group">
         <button @click="resetTransform" class="action-button">
-          Reset Transform
+          {{ t('props.resetTransform') }}
         </button>
         <button @click="flipHorizontal" class="action-button">
-          Flip Horizontal
+          {{ t('props.flipHorizontal') }}
         </button>
         <button @click="flipVertical" class="action-button">
-          Flip Vertical
+          {{ t('props.flipVertical') }}
         </button>
       </div>
     </div>
@@ -117,6 +117,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { ZineContent } from '@/types';
 import NumberInput from './NumberInput.vue';
 import { useProjectStore } from '@/stores/project';
@@ -131,6 +132,7 @@ interface Emits {
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
+const { t } = useI18n();
 const projectStore = useProjectStore();
 
 const transformData = computed(() => {

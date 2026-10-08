@@ -17,7 +17,7 @@
       class="color-text"
       placeholder="#000000"
     />
-    <button @click="setTransparent" class="transparent-button" title="Set transparent">
+    <button @click="setTransparent" class="transparent-button" :title="t('props.setTransparent')">
       <Slash :size="16" stroke-width="2.5" />
     </button>
   </div>
@@ -25,6 +25,9 @@
 
 <script setup lang="ts">
 import { Slash } from 'lucide-vue-next';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 interface Props {
   value: string;
